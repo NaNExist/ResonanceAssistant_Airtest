@@ -1,0 +1,27 @@
+{
+    "city": {
+        "mande": {
+            "exchange": [990, 200]
+        },
+        "onederland": {
+            "exchange": [790, 300]
+        },
+        "wilderness_station": {
+            "exchange": [970, 260]
+        },
+        "anita_energy_research_institute": {
+            "exchange": [640,300]
+        }
+    },
+    "product": {
+        "图形加速卡": "graphics_ acceleration _card",
+        "钛矿石": "titanium_ore",
+        "桦石发财树": "birch_stone_money_tree",
+        "石墨烯电池": "graphene_battery",
+        "阿妮塔101民用无人机": "titanium_ore",
+        "人工晶花": "artificial_crystal_flower",
+        "石墨烯": "graphene",
+        "坚果": "nut",
+        "锂电池": "lithium_battery"
+    }
+}
