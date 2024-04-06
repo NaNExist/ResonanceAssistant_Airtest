@@ -1,23 +1,31 @@
 # -*- encoding=utf8 -*-
-#py库
-import json
-#airtest库
+
+
 from airtest.core.api import *
-#RAA库
+import json
 import resource.function.city_guide as guide
 import resource.function.trade_action as trade
 import resource.function.game_action as game
 import resource.function.battle_action as battle
 import resource.function.travel_action as travel
 
-#这个应该放在game_action里面
 # 设置一些全局参数
 ST.THRESHOLD = 0.9
 ST.SAVE_IMAGE = False
 
-# 搞了个临时ui
-if __name__ == '__main__':
+game.init()
 
+
+# game.startupapp()
+
+
+# 测试购买用函数，主界面启动  0是买1是卖
+def testbuy_sell(type=0):
+    guide.test(type)
+    trade.test(type, ["钛矿石"])
+
+
+def usertest():
     choose = 0
     game.init()
     while True:
@@ -66,3 +74,4 @@ if __name__ == '__main__':
                 battle.battle_loop()
 
 
+testbuy_sell(0)
