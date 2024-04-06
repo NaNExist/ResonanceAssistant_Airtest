@@ -1,6 +1,6 @@
 {
     "city": {
-        "mande": {
+        "mander_mine": {
             "exchange": [990, 200],
             "rest": [570,100],
             "police": [550,400],
@@ -19,17 +19,15 @@
             "exchange": [540,250],
             "rest": [780,110],
             "police": [900,340]
+        },
+        "brcl_outpost": {
+            "exchange": [1000,380]
+        },
+        "shoggolith_city": {
+            "exchange": [1150,350]
+        },
+        "clarity_data_center_administration_bureau": {
+            "exchange": [120,410]
         }
-    },
-    "product": {
-        "图形加速卡": "graphics_ acceleration _card",
-        "钛矿石": "titanium_ore",
-        "桦石发财树": "birch_stone_money_tree",
-        "石墨烯电池": "graphene_battery",
-        "阿妮塔101民用无人机": "titanium_ore",
-        "人工晶花": "artificial_crystal_flower",
-        "石墨烯": "graphene",
-        "坚果": "nut",
-        "锂电池": "lithium_battery"
     }
 }
