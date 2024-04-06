@@ -19,6 +19,15 @@
             "exchange": [540,250],
             "rest": [780,110],
             "police": [900,340]
+        },
+        "brcl_outpost": {
+            "exchange": [1000,380]
+        },
+        "shoggolith_city": {
+            "exchange": [1150,350]
+        },
+        "clarity_data_center_administration_bureau": {
+            "exchange": [120,410]
         }
     }
 }
