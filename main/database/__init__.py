@@ -22,7 +22,7 @@ class CityEnum(enum.IntEnum):
     - 可以用 `CityEnum.修格里城` 来访问修格里城这个城市
     - 也可以用 `CityEnum["修格里城"]` 来访问修格里城这个城市
     - 还可以用 `CityEnum(1)` 来访问修格里城这个城市
-    
+
     注意: 编号从 1 开始
     """
     修格里城 = enum.auto()
@@ -38,6 +38,9 @@ class CityEnum(enum.IntEnum):
     def __repr__(self) -> str:
         return f"城市({self.name})"
 
+    def __str__(self) -> str:
+        return self.__repr__()
+
 
 CITIES: List[City] = list(CityEnum)
 """可用城市列表"""
@@ -45,7 +48,7 @@ CITIES: List[City] = list(CityEnum)
 
 class Product(enum.IntEnum):
     """商品类
-    
+
     注意: 编号从 1 开始
     """
 
@@ -66,6 +69,9 @@ class Product(enum.IntEnum):
 
     def __repr__(self) -> str:
         return f"商品({self.name})"
+
+    def __str__(self) -> str:
+        return self.__repr__()
 
 
 PRODUCTS: List[Product] = list(Product)
@@ -152,7 +158,8 @@ except:
 
 # Sort by city & product index
 
-DEFAULT_PRICE = DEFAULT_PRICE.reindex(labels=map(lambda x: x.name, CITIES), columns=map(lambda x: x.name, PRODUCTS))
+DEFAULT_PRICE = DEFAULT_PRICE.reindex(labels=map(
+    lambda x: x.name, CITIES), columns=map(lambda x: x.name, PRODUCTS))
 
 DEFAULT_PRICE_MATRIX = DEFAULT_PRICE.to_numpy()
 
