@@ -2,6 +2,15 @@
 
 .conda
 
+# Python
+
+*.pyc
+
 # Mac OS
 
 .DS_Store
+
+# Project
+
+.env
+log*
