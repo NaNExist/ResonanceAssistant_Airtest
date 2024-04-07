@@ -6,12 +6,14 @@ def startupapp(appname="com.hermes.goda"):
     # 循环检测启程图标，检测到就结束，没有就疯狂点击左下角（(*^_^*)
     flag = True
     while flag:
-        try:
-            if wait(Template(filename="resource/template/guide/map_ui.png", resolution=(1280, 720)), timeout=1):
-                flag = False
-                print("success startup")
-        except TargetNotFoundError:
-            touch(v=(20, 700))
+        loc = exists(Template(filename="resource/template/guide/map_ui.png", resolution=(1280, 720)))
+        if loc:
+            return True
+            print("success startup")
+        loc = exists(Template(filename="resource/template/guide/confirm.png", resolution=(1280, 720)))
+        if loc:
+            touch(loc)
+        touch(v=(20, 700))
 
 
 def closeapp(appname="com.hermes.goda"):
@@ -19,6 +21,11 @@ def closeapp(appname="com.hermes.goda"):
 
 
 def init(devices=None, logdir=True, project_root="log/log.txt", compress=90):
+
+
+    ST.THRESHOLD = 0.9
+    ST.SAVE_IMAGE = False
+
     if devices is None:
         devices = ["android://127.0.0.1:5037/127.0.0.1:7555"]
     auto_setup(__file__, devices=devices, logdir=logdir, project_root=project_root, compress=compress)
