@@ -21,7 +21,8 @@ def buyproduct(book=0, product=None):
         return False
 
     #这里负责吃书
-
+    if book > 0:
+        eatbook(book)
 
     # 识别列表中所有商品，找到的点一下，
     newproduct = product.copy()
@@ -120,4 +121,15 @@ def makedeal(type=0, pause=0):
         else:
             touch((1000, 650))
 
-
+def eatbook(times):
+    loc = exists(Template(filename="resource/template/guide/use_porp.png", resolution=(1280, 720)))
+    if loc:
+        touch(loc)
+    loc = exists(Template(filename="resource/template/guide/buy_book.png", resolution=(1280, 720)))
+    if loc:
+        touch((loc[0] + 280, loc[1]))
+    sleep(1)
+    touch((830, 390), times=times - 1)
+    loc = exists(Template(filename="resource/template/guide/confirm.png", resolution=(1280, 720)))
+    if loc:
+        touch(loc)
