@@ -26,14 +26,27 @@ class CityEnum(enum.IntEnum):
     注意: 编号从 1 开始
     """
     修格里城 = enum.auto()
-    # 七号自由港 = enum.auto()
-    # 澄明数据中心 = enum.auto()
-    # 阿妮塔能源研究所 = enum.auto()
-    # 曼德矿场 = enum.auto()
+    七号自由港 = enum.auto()
+    """沟槽的, 记得特殊处理, 一般字符串可能是 `"7号自由港"` """
+    澄明数据中心 = enum.auto()
+    阿妮塔能源研究所 = enum.auto()
+    曼德矿场 = enum.auto()
     淘金乐园 = enum.auto()
-    # 铁盟哨站 = enum.auto()
-    # 荒原站 = enum.auto()
-    # 阿妮塔战备工厂 = enum.auto()
+    铁盟哨站 = enum.auto()
+    荒原站 = enum.auto()
+    阿妮塔战备工厂 = enum.auto()
+    
+    def __getitem__(self: type[enum._EnumMemberT], name: str) -> enum._EnumMemberT:
+        if name == "7号自由港":
+            return self["七号自由港"]
+        return super().__getitem__(name)
+    
+    @enum.DynamicClassAttribute
+    def name(self):
+        __name = super(CityEnum, self).name
+        if __name == "七号自由港":
+            return "7号自由港"
+        return __name
 
     def __repr__(self) -> str:
         return f"城市({self.name})"
