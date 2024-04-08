@@ -60,13 +60,19 @@ class CityEnum(enum.IntEnum):
         return FATIGUE_COST.loc[self.name, target.name]
 
     @cached_property
-    def products(self) -> list[Product]:
+    def products(self) -> List[Product]:
         try:
-            return list(CITY_PRODUCT_MAP[self.id.name].keys())
+            return list(CITY_PRODUCT_MAP[self].keys())
         except KeyError:
-            raise ValueError(f"快催开发者添加城市 {self.id} 的商品列表")
-        finally:
-            return []
+            raise ValueError(f"快催开发者添加城市 {self} 的商品列表")
+
+    @property
+    def product_stock(self) -> Dict[Product, int]:
+        """返回城市商品库存"""
+        try:
+            return CITY_PRODUCT_MAP[self]
+        except KeyError:
+            raise ValueError(f"快催开发者添加城市 {self} 的商品库存")
 
     @property
     def tax_rate(self):
