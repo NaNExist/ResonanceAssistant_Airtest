@@ -1,12 +1,24 @@
 from airtest.core.api import *
-import json
+import resource.function.city_guide as guide
 
 
-def test(type, list):
-    buyproduct(type, list)
+def test(selllist , buylist, buybook):
+    sleep(3)
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    guide.choose(1)
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    sellproduct(selllist)
+    sleep(3)
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    guide.choose(0)
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    buyproduct(book=buybook,product=buylist)
+    guide.backmain()
+    return True
 
 
-#
+
+
 def buyproduct(book=0, product=None):
     """
     初步购买逻辑，启动界面在商品界面
@@ -19,23 +31,26 @@ def buyproduct(book=0, product=None):
         product = []
         print("空参数")
         return False
+    print("购买列表：", product)
 
-    #这里负责吃书
+    # 这里负责吃书,book大于10的没写，应该没人这么无聊吧
     if book > 0:
         eatbook(book)
 
     # 识别列表中所有商品，找到的点一下，
     newproduct = product.copy()
-    while newproduct:
+    times = 2
+    while newproduct and times > 0:
         for i in product:
             loc = exists(
                 Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
             if loc:
                 touch((loc[0] + 120, loc[1]))
                 newproduct.remove(i)
-        product = newproduct
+        product = newproduct.copy()
         print("待购货物", product)
-        swipe((670, 650), (670, 200), duration=1)
+        swipe((670, 450), (670, 200), duration=1)
+        times -= 1
 
     makedeal()
 
@@ -47,16 +62,15 @@ def buyproduct(book=0, product=None):
     while flag:
         loc = exists(Template(filename="resource/template/guide/home.png", resolution=(1280, 720)))
         if loc:
-            touch(loc)
             flag = False
         else:
             touch((20, 700))
     return True
 
-def sellproduct(type=0, product=None):
+
+def sellproduct(product=None):
     """
     初步购买逻辑，启动界面在商品界面
-    :param type: 行动类别 0是买 1是卖
     :param product: 列表，目前只支持中文商品列表，后期会改成商品代号
     :return: True表示正常完成
     """
@@ -68,18 +82,23 @@ def sellproduct(type=0, product=None):
 
     # 识别列表中所有商品，找到的点一下，
     newproduct = product.copy()
-    while newproduct:
+    times = 2
+    while newproduct and times > 0:
         for i in product:
             loc = exists(
                 Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
             if loc:
                 touch((loc[0] + 120, loc[1]))
                 newproduct.remove(i)
-        product = newproduct
+                sleep(1)
+        product = newproduct.copy()
         print("待卖货物", product)
-        swipe((670, 650), (670, 200), duration=1)
+        swipe((670, 650), (470, 200), duration=1)
+        times -= 1
 
-    makedeal()
+    if not makedeal():
+        guide.back()
+        return False
 
     sleep(2)
     # 有时候会出问题，加个sleep看看
@@ -89,20 +108,10 @@ def sellproduct(type=0, product=None):
     while flag:
         loc = exists(Template(filename="resource/template/guide/home.png", resolution=(1280, 720)))
         if loc:
-            touch(loc)
             flag = False
         else:
             touch((20, 700))
     return True
-
-def dealdealproduct_all(type=0, local=False):
-    """
-
-    :param type:
-    :param local: 是否买卖本地商品 False为否，True为真
-    :return:完成返回True
-    """
-    pass
 
 
 def makedeal(type=0, pause=0):
@@ -113,13 +122,17 @@ def makedeal(type=0, pause=0):
     :return:
     """
     #  固定位置点击
-    while True:
+    flag = 3
+    while flag>0:
         loc = exists(Template(filename="resource/template/guide/deal_about.png", resolution=(1280, 720)))
         if loc:
             touch((20, 700))
             return True
         else:
             touch((1000, 650))
+            flag-=1
+    return False
+
 
 def eatbook(times):
     loc = exists(Template(filename="resource/template/guide/use_porp.png", resolution=(1280, 720)))

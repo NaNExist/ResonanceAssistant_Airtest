@@ -1,15 +1,12 @@
 # -*- encoding=utf8 -*-
-from airtest.core.api import *
+
 
 import resource.function.city_guide as guide
 import resource.function.trade_action as trade
 import resource.function.game_action as game
 import resource.function.battle_action as battle
 import resource.function.travel_action as travel
-
-
-
-
+import resource.function.core as core
 
 def usertest():
     game.init()
@@ -65,66 +62,30 @@ def usertest():
                 # city1buylist= input("").split(" ")
                 # print("输入" + citylist[1] + "城市购买商品,中文输入,空格分开")
                 # city2buylist = input("").split(" ")
-                
+
                 # 这里用预设列表了，输入太慢，
 
-                citylist = ["修格里城", "淘金乐园"]
-                city1buylist = ["发动机", "弹丸加速装置", "红茶", "沃德烤鸡", "高档餐具", "罐头", "沃德山泉"]
-                city2buylist = ["沙金", "青金石", "漆黑矿渣","玛瑙","铁矿石", "石英砂"]
+                citylist = ["修格里城", "阿妮塔能源研究站"]
+                #此处为往返城市名称，行驶前建议留足够仓库空间，不在第一个城市的会先开到第一个城市再开始
 
-                autorun(citylist, city1buylist, city2buylist)
+                city1buylist = "红茶,弹丸加速装置"
+                # 这里指在第一个城市购买的商品，会在第二个城市售卖，逗号分隔的字符串
+                city2buylist = "阿妮塔小型桦树发电机,石墨烯电池,阿妮塔101民用无人机,家用太阳能电池组,锂电池,充电电池"
+                # 这里指在第二个城市购买的商品，会在第一个城市售卖，逗号分隔的字符串
 
+                city1book = 5
+                # 买第一个城市商品用多少书
+                city2book = 3
+                # 买第2个城市商品用多少书
 
+                city1list = list(city1buylist.split(","))
+                city2list = list(city2buylist.split(","))
+                #将商品处理成列表
 
+                game.sleep(5)
+                #图一乐的延迟
+                core.autorun(citylist, city1list, city2list,city1book,city2book)
 
-
-
-def autorun(citylist, productlist1, productlist2):
-    #预处理数据
-    citydir = {"阿妮塔能源研究站": "a", "7号自由港": "7", "澄明数据中心": "c", "修格里城": "x", "铁盟哨站": "tie",
-               "荒原站": "h", "曼德矿场": "m", "淘金乐园": "t", "阿妮塔战备工厂": "an"}
-    citydir2 = {"阿妮塔能源研究站": "anita_energy_research_institute", "7号自由港": "freeport",
-                "澄明数据中心": "clarity_data_center_administration_bureau",
-                "修格里城": "shoggolith_city", "铁盟哨站": "brcl_outpost",
-                "荒原站": "wilderness_station", "曼德矿场": "mander_mine", "淘金乐园": "onederland"}
-
-    # 先检查在哪个城市
-    guide.entercity()
-    cityname = guide.searchcity()
-    guide.backmain()
-
-    # 前往1号城
-    if cityname != citydir2[citylist[0]]:
-        travel.test(citydir[citylist[0]])
-
-    guide.entercity()
-    guide.enterexchange(0)
-    trade.buyproduct(product=productlist1)
-
-    travel.test(citydir[citylist[1]])
-
-    while True:
-        # 这里在2号城
-        guide.entercity()
-        guide.enterexchange(1)
-        trade.sellproduct(product=productlist1)
-
-        guide.entercity()
-        guide.enterexchange(0)
-        trade.buyproduct(product=productlist2)
-
-        travel.test(citydir[citylist[0]])
-
-        # 这里在1号城
-        guide.entercity()
-        guide.enterexchange(1)
-        trade.sellproduct(product=productlist2)
-
-        guide.entercity()
-        guide.enterexchange(0)
-        trade.buyproduct(product=productlist1)
-
-        travel.test(citydir[citylist[1]])
 
 
 usertest()
