@@ -1,7 +1,8 @@
 from airtest.core.api import *
 import json
 
-#这里是从json中读取city的数据，目前只有各个城市交易所的坐标，其他的待补充
+
+# 这里是从json中读取city的数据，目前只有各个城市交易所的坐标，其他的待补充
 def get_city_inf(city="", information=""):
     """
 
@@ -13,7 +14,8 @@ def get_city_inf(city="", information=""):
         data = json.load(f)
     return data["city"][city][information]
 
-#这里是从主界面进入城市界面
+
+# 这里是从主界面进入城市界面
 def entercity():
     """
     从主界面到城市界面
@@ -22,16 +24,19 @@ def entercity():
     touch(Template(filename="resource/template/guide/city_ui.png", resolution=(1280, 720)))
     sleep(3)
 
+
 # 进交易所
-def enterexchange(type=0):
+def enterexchange(cityname=""):
     """
 
     :param type:数字表示进第几个项目，0开始
     :return:
     """
-    touch(get_city_inf(searchcity(), "exchange"))
-    sleep(3)
-    choose(type)
+    if not bool(cityname):
+        touch(get_city_inf(searchcity(), "exchange"))
+    else:
+        touch(get_city_inf(cityname, "exchange"))
+
 
 #  这里是用于铁安居，商会，交易所一类的进入不同的部分用的，无确认运行，目前最高5层
 def choose(type=0):
@@ -52,8 +57,9 @@ def choose(type=0):
         case 4:
             touch((940, 640))
 
+
 # 进商会，目前没啥用
-def entershop(type = 0):
+def entershop(type=0):
     """
 
     :param type:数字表示进第几个项目，0开始
@@ -64,7 +70,7 @@ def entershop(type = 0):
     choose(type)
 
 
-#这里是在城市界面中识别城市，返回值是识别到的城市名称
+# 这里是在城市界面中识别城市，返回值是识别到的城市名称(英文
 def searchcity():
     """
     注意，只能在城市界面运行
@@ -77,7 +83,8 @@ def searchcity():
             if exists(Template(filename="resource/template/city/" + i, resolution=(1280, 720))):
                 return i.rsplit('.', 1)[0]
 
-#用来回到主界面
+
+# 用来回到主界面
 def backmain():
     """
     回到主界面
@@ -90,7 +97,21 @@ def backmain():
             touch(loc)
             flag = False
 
-#测试用函数
+
+def back():
+    """
+    回到主界面
+    :return:
+    """
+    flag = True
+    while flag:
+        loc = exists(Template(filename="resource/template/guide/return.png", resolution=(1280, 720), threshold=0.9))
+        if loc:
+            touch(loc)
+            flag = False
+
+
+# 测试用函数
 def test(test):
     entercity()
     enterexchange(test)
