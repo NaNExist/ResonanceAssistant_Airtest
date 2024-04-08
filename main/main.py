@@ -1,5 +1,6 @@
 # -*- encoding=utf8 -*-
 from airtest.core.api import *
+import dotenv
 
 import resource.function.city_guide as guide
 import resource.function.trade_action as trade
@@ -12,7 +13,10 @@ import resource.function.travel_action as travel
 
 
 def usertest():
-    game.init()
+    dotenv.load_dotenv()
+    device_url = os.getenv("DEVICE")
+    device_url = None if device_url == None else [device_url]
+    game.init(devices=device_url)
     while True:
 
         print("选择操作:")
