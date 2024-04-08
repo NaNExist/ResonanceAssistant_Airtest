@@ -37,11 +37,6 @@ class CityEnum(enum.IntEnum):
     荒原站 = enum.auto()
     阿妮塔战备工厂 = enum.auto()
     
-    def __getitem__(self: type[enum._EnumMemberT], name: str) -> enum._EnumMemberT:
-        if name == "7号自由港":
-            return self["七号自由港"]
-        return super().__getitem__(name)
-    
     @enum.DynamicClassAttribute
     def name(self):
         __name = super(CityEnum, self).name
@@ -55,8 +50,34 @@ class CityEnum(enum.IntEnum):
     def __str__(self) -> str:
         return self.__repr__()
 
+    def travel_cost(self, target: CityEnum) -> int:
+        """不考虑用户的其他加成(即无加成)时两站之间行驶的疲劳值消耗"""
+        # TODO: Make this not fixed
+        # return 25
+        if self.name == target.name:
+            print(f"正在计算同城({self.name})之间的疲劳值消耗")
+            return 0
+        return FATIGUE_COST.loc[self.name, target.name]
 
-CITIES: List[City] = list(CityEnum)
+    @cached_property
+    def products(self) -> list[Product]:
+        try:
+            return list(map(Product, CITY_PRODUCT_MAP[self.id.name]))
+        except KeyError:
+            raise ValueError(f"快催开发者添加城市 {self.id} 的商品列表")
+        finally:
+            return []
+
+    @property
+    def tax_rate(self):
+        """固定税率, 这里取 8% 作为平均估计"""
+        # TODO: Make this not fixed
+        return 0.08
+
+CityEnum._member_map_["7号自由港"] = CityEnum["七号自由港"]
+
+
+CITIES: List[CityEnum] = list(CityEnum)
 """可用城市列表"""
 
 
@@ -68,7 +89,7 @@ class Product(enum.IntEnum):
 
     # TODO: Complete this
     发动机 = enum.auto()
-    # 弹丸加速装置 = enum.auto()
+    弹丸加速装置 = enum.auto()
     红茶 = enum.auto()
     沃德烤鸡 = enum.auto()
     高档餐具 = enum.auto()
@@ -78,8 +99,8 @@ class Product(enum.IntEnum):
     青金石 = enum.auto()
     漆黑矿渣 = enum.auto()
     玛瑙 = enum.auto()
-    # 铁矿石 = enum.auto()
-    # 石英砂 = enum.auto()
+    铁矿石 = enum.auto()
+    石英砂 = enum.auto()
     阿妮塔202军用无人机 = enum.auto()
     铅矿石 = enum.auto()
     精钢 = enum.auto()
@@ -108,7 +129,6 @@ class Product(enum.IntEnum):
     石墨 = enum.auto()
     锂电池 = enum.auto()
     汽配零件 = enum.auto()
-    石英矿 = enum.auto()
     绿松石 = enum.auto()
     人工晶花 = enum.auto()
     荧光棒 = enum.auto()
@@ -129,6 +149,17 @@ class Product(enum.IntEnum):
     碳纤维 = enum.auto()
     游戏卡带 = enum.auto()
     家电 = enum.auto()
+    炮弹 = enum.auto()
+    防弹背心 = enum.auto()
+    棉花 = enum.auto()
+    孔雀石 = enum.auto()
+    琥珀 = enum.auto()
+    图形加速卡 = enum.auto()
+    银矿石 = enum.auto()
+    游戏机 = enum.auto()
+    石墨烯 = enum.auto()
+    石墨烯电池 = enum.auto()
+    阿妮塔小型桦树发电机 = enum.auto()
 
     def __repr__(self) -> str:
         return f"商品({self.name})"
@@ -141,69 +172,76 @@ PRODUCTS: List[Product] = list(Product)
 """可用商品列表"""
 
 # TODO: consider move this to json
-CITY_PRODUCT_MAP: Dict[CityEnum, Product] = {
-    CityEnum.修格里城: [
-        Product["发动机"],
-        # Product["弹丸加速装置"],
-        Product["红茶"],
-        Product["沃德烤鸡"],
-        Product["高档餐具"],
-        Product["罐头"],
-        Product["沃德山泉"],
-    ],
-    CityEnum.淘金乐园: [
-        Product["沙金"],
-        Product["青金石"],
-        Product["漆黑矿渣"],
-        Product["玛瑙"],
-        # Product["铁矿石"],
-        # Product["石英砂"],
-    ],
-}
+# CITY_PRODUCT_MAP: Dict[CityEnum, Product] = {
+#     CityEnum.修格里城: [
+#         Product["发动机"],
+#         Product["弹丸加速装置"],
+#         Product["红茶"],
+#         Product["沃德烤鸡"],
+#         Product["高档餐具"],
+#         Product["罐头"],
+#         Product["沃德山泉"],
+#     ],
+#     CityEnum.淘金乐园: [
+#         Product["沙金"],
+#         Product["青金石"],
+#         Product["漆黑矿渣"],
+#         Product["玛瑙"],
+#         Product["铁矿石"],
+#         Product["石英砂"],
+#     ],
+# }
 
 # TODO: 价格表有缺项, 补全后启用
-# CITY_PRODUCT_TABLE_FNAME = "城市商品表.json"
-# CITY_PRODUCT_TABLE_DIR = Path(__file__).parent / CITY_PRODUCT_TABLE_FNAME
-# __table = {}
-# with open(CITY_PRODUCT_TABLE_DIR, "r") as f:
-#     __table = json.load(f)
+CITY_PRODUCT_TABLE_FNAME = "城市商品表.json"
+CITY_PRODUCT_TABLE_DIR = Path(__file__).parent / CITY_PRODUCT_TABLE_FNAME
+__table = {}
+with open(CITY_PRODUCT_TABLE_DIR, "r") as f:
+    __table = json.load(f)
 
-# for city_name in __table:
-#     CITY_PRODUCT_MAP[CityEnum[city_name]] = list(map(Product.__getitem__, __table[city_name]))
+CITY_PRODUCT_MAP = {}
+for city_name in __table:
+    try:
+        city = CityEnum[city_name]
+    except:
+        print(f"城市 {city_name} 暂不支持")
+        continue
+    CITY_PRODUCT_MAP[city] = list(map(Product.__getitem__, __table[city_name]))
 
 
-class City:
-    """城市类
-    """
+# class City:
+#     """城市类
+#     """
 
-    def __init__(self, name: str) -> None:
-        try:
-            self.id: CityEnum = CityEnum[name]
-        except KeyError:
-            raise ValueError(f"City {name} is not available now")
+#     def __init__(self, name: str) -> None:
+#         try:
+#             self.id: CityEnum = CityEnum[name]
+#         except KeyError:
+#             raise ValueError(f"City {name} is not available now")
 
-    def travel_cost(self, target: City) -> int:
-        """不考虑用户的其他加成(即无加成)时两站之间行驶的疲劳值消耗"""
-        # TODO: Make this not fixed
-        return 25
+#     def travel_cost(self, target: City) -> int:
+#         """不考虑用户的其他加成(即无加成)时两站之间行驶的疲劳值消耗"""
+#         # TODO: Make this not fixed
+#         # return 25
+#         return FATIGUE_COST.loc[self.id.name, target.id.name]
 
-    def __repr__(self) -> str:
-        return f"城市({self.id.name})"
+#     def __repr__(self) -> str:
+#         return f"城市({self.id.name})"
 
-    @cached_property
-    def products(self) -> list[Product]:
-        try:
-            return list(map(Product, CITY_PRODUCT_MAP[self.id.name]))
-        except KeyError:
-            raise ValueError(f"快催开发者添加城市 {self.id} 的商品列表")
-        finally:
-            return []
+#     @cached_property
+#     def products(self) -> list[Product]:
+#         try:
+#             return list(map(Product, CITY_PRODUCT_MAP[self.id.name]))
+#         except KeyError:
+#             raise ValueError(f"快催开发者添加城市 {self.id} 的商品列表")
+#         finally:
+#             return []
 
-    @property
-    def tax_rate(self):
-        """固定税率, 这里取 8% 作为平均估计"""
-        # TODO: Make this not fixed
-        return 0.08
+#     @property
+#     def tax_rate(self):
+#         """固定税率, 这里取 8% 作为平均估计"""
+#         # TODO: Make this not fixed
+#         return 0.08
 
 # 加载基础价格表并检查其格式(确保包含所有代码中用到的商品和城市)
 
@@ -241,6 +279,10 @@ DEFAULT_PRICE = DEFAULT_PRICE.reindex(labels=map(
     lambda x: x.name, CITIES), columns=map(lambda x: x.name, PRODUCTS))
 
 DEFAULT_PRICE_MATRIX = DEFAULT_PRICE.to_numpy()
+
+FATIGUE_COST_TABLE_FNAME = "城市路程疲劳表.csv"
+FATIGUE_COST_TABLE_DIR = Path(__file__).parent / FATIGUE_COST_TABLE_FNAME
+FATIGUE_COST: pd.DataFrame = pd.read_csv(FATIGUE_COST_TABLE_DIR, index_col=0)
 
 
 @dataclass
