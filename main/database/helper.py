@@ -49,8 +49,8 @@ for item in data:
         item = DataItem.from_dict(item)
         if item.type == "sell":
             if item.station not in city_product:
-                city_product[item.station] = []
-            city_product[item.station].append(item.name)
+                city_product[item.station] = {}
+            city_product[item.station][item.name] = item.stock
         # if item.station not in prices.index:
         #     prices.index.append(item.station)
         prices.loc[item.station, item.name] = item.base_price
