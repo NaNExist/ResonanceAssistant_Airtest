@@ -54,16 +54,16 @@ class Product(enum.IntEnum):
 
     # TODO: Complete this
     发动机 = enum.auto()
-    弹丸加速装置 = enum.auto()
-    # 红茶 = enum.auto()
-    # 沃德烤鸡 = enum.auto()
-    # 高档餐具 = enum.auto()
-    # 罐头 = enum.auto()
-    # 沃德山泉 = enum.auto()
-    # 沙金 = enum.auto()
-    # 青金石 = enum.auto()
-    # 漆黑矿渣 = enum.auto()
-    # 玛瑙 = enum.auto()
+    # 弹丸加速装置 = enum.auto()
+    红茶 = enum.auto()
+    沃德烤鸡 = enum.auto()
+    高档餐具 = enum.auto()
+    罐头 = enum.auto()
+    沃德山泉 = enum.auto()
+    沙金 = enum.auto()
+    青金石 = enum.auto()
+    漆黑矿渣 = enum.auto()
+    玛瑙 = enum.auto()
     # 铁矿石 = enum.auto()
     # 石英砂 = enum.auto()
 
@@ -81,18 +81,18 @@ PRODUCTS: List[Product] = list(Product)
 CITY_PRODUCT_MAP: Dict[CityEnum, Product] = {
     CityEnum.修格里城: [
         Product["发动机"],
-        Product["弹丸加速装置"],
-        # Product["红茶"],
-        # Product["沃德烤鸡"],
-        # Product["高档餐具"],
-        # Product["罐头"],
-        # Product["沃德山泉"],
+        # Product["弹丸加速装置"],
+        Product["红茶"],
+        Product["沃德烤鸡"],
+        Product["高档餐具"],
+        Product["罐头"],
+        Product["沃德山泉"],
     ],
     CityEnum.淘金乐园: [
-        # Product["沙金"],
-        # Product["青金石"],
-        # Product["漆黑矿渣"],
-        # Product["玛瑙"],
+        Product["沙金"],
+        Product["青金石"],
+        Product["漆黑矿渣"],
+        Product["玛瑙"],
         # Product["铁矿石"],
         # Product["石英砂"],
     ],
@@ -148,12 +148,18 @@ DEFAULT_PRICE: pd.DataFrame = pd.read_csv(DEFAULT_PRICE_TABLE_DIR, index_col=0)
 try:
     assert all((city.name in DEFAULT_PRICE.index) for city in CITIES)
 except:
+    for city in CITIES:
+        if city.name not in DEFAULT_PRICE.index:
+            print(f"城市 {city.name} 不在价格表中")
     raise ValueError("城市列表不匹配")
 
 try:
     assert all((product.name in DEFAULT_PRICE.columns)
                for product in PRODUCTS)
 except:
+    for product in PRODUCTS:
+        if product.name not in DEFAULT_PRICE.columns:
+            print(f"商品 {product.name} 不在价格表中")
     raise ValueError("商品列表不匹配")
 
 # Sort by city & product index
