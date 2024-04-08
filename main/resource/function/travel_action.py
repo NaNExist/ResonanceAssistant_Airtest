@@ -3,8 +3,13 @@ import json
 
 
 def entermap():
-    touch(Template(filename="resource/template/guide/map_ui.png", resolution=(1280, 720)))
-
+    for i in range(3):
+        loc = exists(
+            Template(filename="resource/template/guide/map_ui.png", resolution=(1280, 720)))
+        if loc:
+            touch(loc)
+            return True
+    return False
 
 def searchcity(city_name=""):
     direction = 0
@@ -50,4 +55,5 @@ def endtravel():
 def test(temp):
     entermap()
     searchcity(temp)
+    starttravel()
     endtravel()
