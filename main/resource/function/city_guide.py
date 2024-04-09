@@ -21,8 +21,14 @@ def entercity():
     从主界面到城市界面
     :return:
     """
-    touch(Template(filename="resource/template/guide/city_ui.png", resolution=(1280, 720)))
-    sleep(3)
+    flag = True
+    while flag:
+        loc = exists(Template(filename="resource/template/guide/city_ui.png", resolution=(1280, 720)))
+        if loc:
+            touch(loc)
+            sleep(3)
+            return True
+
 
 
 # 进交易所
