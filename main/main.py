@@ -69,26 +69,26 @@ def usertest():
 
                 # 这里用预设列表了，输入太慢，
 
-                citylist = ["修格里城", "阿妮塔能源研究站"]
+                citylist = ["曼德矿场", "阿妮塔能源研究所"]
                 #此处为往返城市名称，行驶前建议留足够仓库空间，不在第一个城市的会先开到第一个城市再开始
 
-                city1buylist = "红茶,弹丸加速装置"
+                city1buylist = "图形加速卡,钛矿石,铁轨用特种钢材,曼德工具箱,黄铜,建材"
                 # 这里指在第一个城市购买的商品，会在第二个城市售卖，逗号分隔的字符串
                 city2buylist = "阿妮塔小型桦树发电机,石墨烯电池,阿妮塔101民用无人机,家用太阳能电池组,锂电池,充电电池"
                 # 这里指在第二个城市购买的商品，会在第一个城市售卖，逗号分隔的字符串
 
-                city1book = 5
+                city1book = 2
                 # 买第一个城市商品用多少书
-                city2book = 3
+                city2book = 2
                 # 买第2个城市商品用多少书
 
                 city1list = list(city1buylist.split(","))
                 city2list = list(city2buylist.split(","))
                 #将商品处理成列表
-
+                print(city1list,city2list)
                 game.sleep(5)
                 #图一乐的延迟
-                core.autorun(citylist, city1list, city2list,city1book,city2book)
+                core.autorun(citylist, city1list, city2list,city1book,city2book,times=3)
 
 
 

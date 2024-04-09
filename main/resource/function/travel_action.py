@@ -21,16 +21,16 @@ def searchcity(city_name=""):
             return True
         match direction // 3:
             case 0:
-                swipe((1000, 360), (340, 360), duration=1)
+                swipe((640, 140), (640, 620), duration=1)
                 direction += 1
             case 1:
-                swipe((640, 620), (640, 140), duration=1)
+                swipe((1000, 360), (340, 360), duration=1)
                 direction += 1
             case 2:
-                swipe((340, 360), (1000, 360), duration=1)
+                swipe((640, 620), (640, 140), duration=1)
                 direction += 1
             case 3:
-                swipe((640, 140), (640, 620), duration=1)
+                swipe((340, 360), (1000, 360), duration=1)
                 direction += 1
         direction %= 12
 
@@ -52,8 +52,7 @@ def endtravel():
 
 
 # 这个是完整的测试逻辑
-def test(temp):
+def citytravel(aimcity):
     entermap()
-    searchcity(temp)
-    starttravel()
-    endtravel()
+    searchcity(aimcity)
+    travel()
