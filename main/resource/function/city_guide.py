@@ -126,6 +126,8 @@ def back():
         if loc:
             touch(loc)
             flag = False
+            sleep(1)
+        sleep(1)
 
 
 # 测试用函数
