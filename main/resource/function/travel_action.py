@@ -15,7 +15,7 @@ def searchcity(city_name=""):
     direction = 0
     flag = True
     while flag:
-        loc = exists(Template(filename="resource/template/guide/" + city_name + ".png", resolution=(1280, 720),threshold=0.8))
+        loc = exists(Template(filename="resource/template/guide/map/" + city_name + ".png", resolution=(1280, 720),threshold=0.8))
         if loc:
             touch(loc)
             return True
@@ -39,6 +39,7 @@ def travel():
     endtravel()
 def starttravel():
     touch(Template(filename="resource/template/guide/start_travel.png", resolution=(1280, 720)))
+
 
 
 def endtravel():

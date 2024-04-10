@@ -9,8 +9,7 @@ def test(selllist, buylist, buybook):
     return True
 
 
-
-def buyproduct(talk = 0,book=0, product=None):
+def buyproduct(talktimes=0, book=0, product=None):
     """
     初步购买逻辑，启动界面在交易所选择买还是卖的界面
     :param book: 吃多少书
@@ -46,6 +45,8 @@ def buyproduct(talk = 0,book=0, product=None):
         swipe((670, 450), (670, 200), duration=1)
         times -= 1
 
+    talk(talktimes)
+
     makedeal()
 
     sleep(2)
@@ -62,7 +63,7 @@ def buyproduct(talk = 0,book=0, product=None):
     return True
 
 
-def sellproduct(talk = 0,product=None):
+def sellproduct(talktimes=0, product=None):
     """
     初步购买逻辑，启动界面在商品界面
     :param product: 列表，目前只支持中文商品列表，后期会改成商品代号
@@ -95,6 +96,8 @@ def sellproduct(talk = 0,product=None):
         print("待卖货物", product)
         swipe((670, 650), (470, 200), duration=1)
         times -= 1
+
+    talk(talktimes)
 
     if not makedeal():
         guide.back()
@@ -135,7 +138,7 @@ def makedeal(type=0, pause=0):
 
 
 def eatbook(times):
-    if times<=0:
+    if times <= 0:
         return False
     loc = exists(Template(filename="resource/template/guide/use_porp.png", resolution=(1280, 720)))
     if loc:
@@ -152,14 +155,18 @@ def eatbook(times):
 
 
 def talk(times):
+    # todo 判断是否砍满，满了就退出
+    if times == 0:
+        return False
     loc = exists(Template(filename="resource/template/action/discuss.png", resolution=(1280, 720)))
     if loc:
         for i in range(times):
             touch(loc)
             sleep(5)
+    return True
+
 
 def iswarehouseempty():
     if exists(Template(filename="resource/template/guide/empty_warehouse.png", resolution=(1280, 720))):
         return False
     return True
-

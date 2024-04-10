@@ -3,7 +3,7 @@
         "mander_mine": {
             "exchange": [990, 200],
             "rest": [570,100],
-            "police": [550,400],
+            "battle": [550,400],
             "commerce": [320,150]
         },
         "onederland": {
@@ -18,7 +18,7 @@
         "freeport": {
             "exchange": [540,250],
             "rest": [780,110],
-            "police": [900,340]
+            "battle": [900,340]
         },
         "brcl_outpost": {
             "exchange": [1000,380]
@@ -27,7 +27,8 @@
             "exchange": [1150,350]
         },
         "clarity_data_center_administration_bureau": {
-            "exchange": [120,410]
+            "exchange": [120,410],
+            "battle": [500,120]
         }
     }
 }

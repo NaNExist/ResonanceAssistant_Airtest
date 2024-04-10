@@ -10,7 +10,7 @@ def get_city_inf(city="", information=""):
     :param information: 需要坐标的店面类型
     :return: 店面坐标
     """
-    with open("resource/setting/loaction.json") as f:
+    with open("resource/setting/location.json") as f:
         data = json.load(f)
     return data["city"][city][information]
 
@@ -30,12 +30,11 @@ def entercity():
             return True
 
 
-
 # 进交易所
 def enterexchange(cityname=""):
     """
 
-    :param type:数字表示进第几个项目，0开始
+    :param cityname: 进那个地方
     :return:
     """
     if not bool(cityname):
@@ -44,11 +43,23 @@ def enterexchange(cityname=""):
         touch(get_city_inf(cityname, "exchange"))
 
 
+def enterbattle(cityname=""):
+    """
+
+    :param cityname: 进那个地方
+    :return:
+    """
+    if not bool(cityname):
+        touch(get_city_inf(searchcity(), "battle"))
+    else:
+        touch(get_city_inf(cityname, "battle"))
+
+
 #  这里是用于铁安居，商会，交易所一类的进入不同的部分用的，无确认运行，目前最高5层
 def choose(type=0):
     """
 
-    :param type:用来点击 铁安居，商会，交易所进入后的分支，运行不进行确认
+    :param type:用来点击 铁安居，商会，交易所进入后的分支，不进行确认运行
     :return:
     """
     match type:
@@ -84,9 +95,9 @@ def searchcity():
     """
     flag = True
     while flag:
-        for i in os.listdir("resource\\template\\city\\"):
+        for i in os.listdir("resource\\template\\city\\logo"):
             print(i)
-            if exists(Template(filename="resource/template/city/" + i, resolution=(1280, 720))):
+            if exists(Template(filename="resource/template/city/logo/" + i, resolution=(1280, 720))):
                 return i.rsplit('.', 1)[0]
 
 
@@ -106,7 +117,7 @@ def backmain():
 
 def back():
     """
-    回到主界面
+    回退
     :return:
     """
     flag = True

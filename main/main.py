@@ -42,23 +42,23 @@ def usertest():
                 choose = int(input())
                 match choose:
                     case 1:
-                        travel.test("a")
+                        travel.citytravel("a")
                     case 2:
-                        travel.test("7")
+                        travel.citytravel("7")
                     case 3:
-                        travel.test("c")
+                        travel.citytravel("c")
                     case 4:
-                        travel.test("x")
+                        travel.citytravel("x")
                     case 5:
-                        travel.test("tie")
+                        travel.citytravel("tie")
                     case 6:
-                        travel.test("h")
+                        travel.citytravel("h")
                     case 7:
-                        travel.test("m")
+                        travel.citytravel("m")
                     case 8:
-                        travel.test("t")
+                        travel.citytravel("t")
             case 4:
-                battle.battle_loop()
+                battle.test(times=1,enemy=3,difficult=5)
             case 5:
                 # print("需要输入循环地点,中文输入,空格分开")
                 # citylist = input("").split(" ")
