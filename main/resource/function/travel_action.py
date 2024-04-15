@@ -1,9 +1,10 @@
 from airtest.core.api import *
+import resource.function.city_guide as guide
 import json
 
 
 def entermap():
-    for i in range(3):
+    for i in range(5):
         loc = exists(
             Template(filename="resource/template/guide/map_ui.png", resolution=(1280, 720)))
         if loc:
@@ -11,12 +12,15 @@ def entermap():
             return True
     return False
 
-def searchcity(city_name=""):
+
+def searchcity(end_city_name=""):
     direction = 0
     flag = True
     while flag:
-        loc = exists(Template(filename="resource/template/guide/map/" + city_name + ".png", resolution=(1280, 720),threshold=0.8))
+        loc = exists(Template(filename="resource/template/city/map/" + end_city_name + ".png", resolution=(1280, 720),
+                              threshold=0.8))
         if loc:
+            print("找到目标", end_city_name, "坐标", loc)
             touch(loc)
             return True
         match direction // 3:
@@ -34,12 +38,39 @@ def searchcity(city_name=""):
                 direction += 1
         direction %= 12
 
+
+def guidecity(start_city_name="", end_city_name=""):
+    startcityloc = guide.get_city_inf(city=start_city_name, information="maploc")
+    endcityloc = guide.get_city_inf(city=end_city_name, information="maploc")
+    directionvector = [endcityloc[0] - startcityloc[0], endcityloc[1] - startcityloc[1]]
+    k = 300 / max(directionvector, key=abs).__abs__()
+    direction = (int(directionvector[0] * k), int(-directionvector[1] * k))
+    print(direction)
+    swipe((640 + direction[0] // 2, 360 - direction[1] // 2), (640 - direction[0] // 2, 360 + direction[1] // 2),
+          duration=1)
+
+    times = 8
+    flag = True
+    while flag and times > 0:
+        loc = exists(Template(filename="resource/template/city/map/" + end_city_name + ".png", resolution=(1280, 720),
+                              threshold=0.8))
+        if loc:
+            print("找到目标", end_city_name, "坐标", loc)
+            touch(loc)
+            return True
+        swipe((640 + direction[0] // 2, 360 - direction[0] // 2), (640 - direction[0] // 2, 360 + direction[0] // 2),
+              duration=1)
+        times -= 1
+    return False
+
+
 def travel():
     starttravel()
     endtravel()
+
+
 def starttravel():
     touch(Template(filename="resource/template/guide/start_travel.png", resolution=(1280, 720)))
-
 
 
 def endtravel():
@@ -53,7 +84,11 @@ def endtravel():
 
 
 # 这个是完整的测试逻辑
-def citytravel(aimcity):
+def citytravel(startcity="", endcity=""):
     entermap()
-    searchcity(aimcity)
+    if startcity != "":
+        if not guidecity(start_city_name=startcity, end_city_name=endcity):
+            searchcity(end_city_name=endcity)
+    else:
+        searchcity(end_city_name=endcity)
     travel()
