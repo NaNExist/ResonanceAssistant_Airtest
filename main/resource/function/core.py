@@ -4,6 +4,8 @@ import resource.function.game_action as game
 import resource.function.battle_action as battle
 import resource.function.travel_action as travel
 
+from win10toast import ToastNotifier
+
 
 def program_plan():
     pass
@@ -27,6 +29,7 @@ def autorun(citylist, productlist1, productlist2, city1book=0, city2book=0, time
                "澄明数据中心": "clarity_data_center_administration_bureau",
                "修格里城": "shoggolith_city", "铁盟哨站": "brcl_outpost",
                "荒原站": "wilderness_station", "曼德矿场": "mander_mine", "淘金乐园": "onederland"}
+    toaster = ToastNotifier()
 
     # 先检查在哪个城市
     guide.entercity()
@@ -35,27 +38,42 @@ def autorun(citylist, productlist1, productlist2, city1book=0, city2book=0, time
 
     # 不在1号城的前往1号城
     if cityname != citydir[citylist[0]]:
-        travel.citytravel(citydir[citylist[0]])
+        toaster.show_toast("跑商通知", "目前在" + cityname+"准备前往"+citydir[citylist[0]], duration=1)
+        travel.citytravel(startcity=cityname, endcity=citydir[citylist[0]])
 
-    while times != 0:
+    time = 0
+    while time != times:
         # 这里在1号城
         cityname = citydir[citylist[0]]
         print(cityname)
+
+        toaster.show_toast("跑商通知", "到达" + cityname, duration=1)
 
         guide.entercity()
         guide.enterexchange(cityname=cityname)
         trade.test(productlist2, productlist1, buybook=city1book)
 
-        travel.citytravel(citydir[citylist[1]])
+        toaster.show_toast("跑商通知", "前往" + citydir[citylist[1]], duration=1)
+
+        travel.citytravel(startcity=cityname, endcity=citydir[citylist[1]])
 
         # 这里在2号城
         cityname = citydir[citylist[1]]
         print(cityname)
 
+        toaster.show_toast("跑商通知", "到达" + cityname, duration=1)
+
         guide.entercity()
         guide.enterexchange(cityname=cityname)
         trade.test(productlist1, productlist2, buybook=city2book)
 
-        travel.citytravel(citydir[citylist[0]])
+        toaster.show_toast("跑商通知", "前往" + citydir[citylist[0]], duration=1)
 
-        times -= 1
+        travel.citytravel(startcity=cityname, endcity=citydir[citylist[0]])
+
+        time += 1
+
+        # 显示通知
+
+        toaster.show_toast("跑商通知", "现在已经跑了" + str(time) + "次" + citylist[0] + "-" + citylist[1] + "循环",
+                           duration=1)

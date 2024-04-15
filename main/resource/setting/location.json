@@ -1,32 +1,41 @@
 {
     "city": {
         "mander_mine": {
+            "maploc": [1645,660],
             "exchange": [990, 200],
             "rest": [570,100],
             "battle": [550,400],
             "commerce": [320,150]
         },
         "onederland": {
+            "maploc": [1745,945],
             "exchange": [790, 300]
         },
         "wilderness_station": {
+            "maploc": [1800,460],
             "exchange": [970, 260]
         },
         "anita_energy_research_institute": {
+            "maploc": [615,1030],
             "exchange": [640,300]
         },
         "freeport": {
+            "maploc": [665,580],
             "exchange": [540,250],
             "rest": [780,110],
             "battle": [900,340]
         },
         "brcl_outpost": {
+            "maploc": [1545,460],
             "exchange": [1000,380]
         },
         "shoggolith_city": {
-            "exchange": [1150,350]
+            "maploc": [1330,460],
+            "exchange": [1150,350],
+            "battle": [330,430]
         },
         "clarity_data_center_administration_bureau": {
+            "maploc": [1045,345],
             "exchange": [120,410],
             "battle": [500,120]
         }
