@@ -7,15 +7,28 @@ import resource.function.game_action as game
 import resource.function.battle_action as battle
 import resource.function.travel_action as travel
 import resource.function.core as core
+from win10toast import ToastNotifier
+
+
 
 def usertest():
     game.init()
+
+
+    # 可以塞测试函数
+    # # price.get_price_table()
+    # a = test.TestPriceDatabase()
+    # a.test_calc_profit_to_and_fro()
+    #
+
+
+
     while True:
 
         print("选择操作:")
         print("1：启动游戏")
         print("2：关闭游戏")
-        print("3：城市间导航")
+        print("3：城市间导航(暂时用不了)")
         print("4：清理澄明度")
         print("5：半自动跑商（要求车库里面留足够空间，最好是空的")
         print("")
@@ -36,27 +49,16 @@ def usertest():
                 print("7：曼德矿场")
                 print("8：淘金乐园")
                 choose = int(input())
-                match choose:
-                    case 1:
-                        travel.citytravel("a")
-                    case 2:
-                        travel.citytravel("7")
-                    case 3:
-                        travel.citytravel("c")
-                    case 4:
-                        travel.citytravel("x")
-                    case 5:
-                        travel.citytravel("tie")
-                    case 6:
-                        travel.citytravel("h")
-                    case 7:
-                        travel.citytravel("m")
-                    case 8:
-                        travel.citytravel("t")
             case 4:
-                battle.test(times=1,enemy=3,difficult=5)
+                # print("输入作战次数（数字1-inf（只会打到没澄明或者到次数，第几类敌人（数字1-3，什么难度（数字1-6（默认打紫箱子的。空格间隔输入")
+                # inputlist = list(map(int,input().split(" ")))
+                # times =  inputlist[0]
+                # enemy = inputlist[1]
+                # difficult = inputlist[2]
+                battle.test(times=2,enemy=2,difficult=4)
+            #   times是作战次数，enemy是选择敌人，difficult是难度选择 均从1开始
             case 5:
-                # print("需要输入循环地点,中文输入,空格分开")
+                # print("需要输入循环地点,中文输入,空格分开,默认跑3次")
                 # citylist = input("").split(" ")
                 # print("输入"+citylist[0]+"城市购买商品,中文输入,空格分开")
                 # city1buylist= input("").split(" ")
@@ -68,24 +70,23 @@ def usertest():
                 citylist = ["曼德矿场", "阿妮塔能源研究所"]
                 #此处为往返城市名称，行驶前建议留足够仓库空间，不在第一个城市的会先开到第一个城市再开始
 
-                city1buylist = "图形加速卡,钛矿石,铁轨用特种钢材,曼德工具箱,黄铜,建材"
+                city1buylist = "图形加速卡, 钛矿石, 曼德工具箱, 铁轨用特种钢材, 钢筋混凝土轨枕"
                 # 这里指在第一个城市购买的商品，会在第二个城市售卖，逗号分隔的字符串
-                city2buylist = "阿妮塔小型桦树发电机,石墨烯电池,阿妮塔101民用无人机,家用太阳能电池组,锂电池,充电电池"
+                city2buylist = "阿妮塔101民用无人机, 家用太阳能电池组, 充电电池, 锂电池"
                 # 这里指在第二个城市购买的商品，会在第一个城市售卖，逗号分隔的字符串
 
                 city1book = 2
                 # 买第一个城市商品用多少书
-                city2book = 2
+                city2book = 0
                 # 买第2个城市商品用多少书
 
-                city1list = list(city1buylist.split(","))
-                city2list = list(city2buylist.split(","))
-                #将商品处理成列表
+                city1list = list(city1buylist.split(", "))
+                city2list = list(city2buylist.split(", "))
+                # 将商品处理成列表
                 print(city1list,city2list)
                 game.sleep(5)
                 #图一乐的延迟
-                core.autorun(citylist, city1list, city2list,city1book,city2book,times=3)
-
+                core.autorun(citylist, productlist1=city1list, productlist2=city2list,city1book=city1book,city2book=city2book)
 
 
 usertest()
