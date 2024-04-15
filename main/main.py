@@ -1,5 +1,6 @@
 # -*- encoding=utf8 -*-
-
+from airtest.core.api import *
+import dotenv
 
 import resource.function.city_guide as guide
 import resource.function.trade_action as trade
@@ -12,16 +13,13 @@ from win10toast import ToastNotifier
 
 
 def usertest():
-    game.init()
 
 
-    # 可以塞测试函数
-    # # price.get_price_table()
-    # a = test.TestPriceDatabase()
-    # a.test_calc_profit_to_and_fro()
-    #
 
-
+    dotenv.load_dotenv()
+    device_url = os.getenv("DEVICE")
+    device_url = None if device_url == None else [device_url]
+    game.init(devices=device_url)
 
     while True:
 
