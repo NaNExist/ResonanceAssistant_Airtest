@@ -28,7 +28,7 @@ def buyproduct(talktimes=0, book=0, product=None):
     sleep(2)
 
     # 这里负责吃书,book大于10的没写，应该没人这么无聊吧
-    print("使用",book,"本书")
+    print("使用", book, "本书")
     eatbook(book)
 
     # 识别列表中所有商品，找到的点一下，
@@ -47,17 +47,15 @@ def buyproduct(talktimes=0, book=0, product=None):
         swipe((670, 450), (670, 200), duration=1)
         times -= 1
 
-
-
     talk(talktimes)
 
     if not makedeal():
+        guide.back()
         return False
 
     sleep(2)
     # 有时候会出问题，加个sleep看看
 
-    #     搜索回到主界面按键，没有说明报表还在，点击左下角，循环处理
 
 def sellproduct(talktimes=0, product=None):
     """
@@ -83,12 +81,12 @@ def sellproduct(talktimes=0, product=None):
     # 识别列表中所有商品，找到的点一下，
     newproduct = product.copy()
     times = 5
-    print("重复尝试次数",times)
+    print("重复尝试次数", times)
     while newproduct and times > 0:
         for i in product:
             loc = exists(Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
             if loc:
-                print("识别到商品：",i)
+                print("识别到商品：", i)
                 touch((loc[0] + 120, loc[1]))
                 newproduct.remove(i)
                 sleep(1)
@@ -100,13 +98,35 @@ def sellproduct(talktimes=0, product=None):
     talk(talktimes)
 
     if not makedeal():
+        guide.back()
         return False
 
     sleep(2)
     # 有时候会出问题，加个sleep看看
 
-    #     搜索回到主界面按键，没有说明报表还在，点击左下角，循环处理
+def sellall(talktimes=0):
 
+    sleep(3)
+    print("进入卖")
+    guide.choose(0)
+    sleep(2)
+
+    if not iswarehouseempty():
+        print("无可售商品,无需后续")
+        guide.back()
+        return False
+
+    while True:
+        loc = exists(Template(filename="resource/template/action/cancelall.png", resolution=(1280, 720)))
+        if loc:
+            break
+        touch((1200,100))
+
+    talk(talktimes)
+
+    if not makedeal():
+        guide.back()
+        return False
 
 def makedeal(type=0, pause=0):
     """
@@ -151,7 +171,7 @@ def talk(times):
     if times == 0:
         print("不计划砍价")
         return False
-    print("计划砍价",times,"次")
+    print("计划砍价", times, "次")
     loc = exists(Template(filename="resource/template/action/discuss.png", resolution=(1280, 720)))
     if loc:
         for i in range(times):
