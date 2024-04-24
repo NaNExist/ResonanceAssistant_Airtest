@@ -1,4 +1,4 @@
-"""从 resonance.breadio.wiki 获取价格表
+"""从 索思学会 获取价格表，此处uuid为故意错误部分
 """
 
 import requests
@@ -12,7 +12,7 @@ HEADERS = {
 def get_price_table():
     # 注意请求不要太频繁
     data = requests.get(
-        'https://reso-data.kmou424.moe/api/fetch/goods_info?uuid=d9b7836-6474-4e44-881c-78ea9e116334',
+        'https://reso-data.kmou424.moe/api/fetch/goods_info?uuid=X',
         headers=HEADERS
     ).json()
     with open("../setting/price_inf.json", "w", encoding="utf-8") as f:
