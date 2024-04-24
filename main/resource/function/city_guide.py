@@ -1,18 +1,5 @@
 from airtest.core.api import *
-import json
-
-
-# 这里是从json中读取city的数据，目前只有各个城市交易所的坐标，其他的待补充
-def get_city_inf(city="", information=""):
-    """
-
-    :param city:城市名称
-    :param information: 需要坐标的店面类型
-    :return: 店面坐标
-    """
-    with open("resource/setting/location.json") as f:
-        data = json.load(f)
-    return data["city"][city][information]
+import resource.function.base_action as base
 
 
 # 这里是从主界面进入城市界面
@@ -38,9 +25,9 @@ def enterexchange(cityname=""):
     :return:
     """
     if not bool(cityname):
-        touch(get_city_inf(searchcity(), "exchange"))
+        touch(base.get_city_inf(searchcity(), "exchange"))
     else:
-        touch(get_city_inf(cityname, "exchange"))
+        touch(base.get_city_inf(cityname, "exchange"))
 
 
 def enterbattle(cityname=""):
@@ -50,9 +37,9 @@ def enterbattle(cityname=""):
     :return:
     """
     if not bool(cityname):
-        touch(get_city_inf(searchcity(), "battle"))
+        touch(base.get_city_inf(searchcity(), "battle"))
     else:
-        touch(get_city_inf(cityname, "battle"))
+        touch(base.get_city_inf(cityname, "battle"))
 
 
 #  这里是用于铁安居，商会，交易所一类的进入不同的部分用的，无确认运行，目前最高5层
@@ -82,7 +69,7 @@ def entershop(type=0):
     :param type:数字表示进第几个项目，0开始
     :return:
     """
-    touch(get_city_inf(searchcity(), "commerce"))
+    touch(base.get_city_inf(searchcity(), "commerce"))
     sleep(3)
     choose(type)
 
@@ -93,12 +80,28 @@ def searchcity():
     注意，只能在城市界面运行
     :return:
     """
-    flag = True
-    while flag:
-        for i in os.listdir("resource\\template\\city\\logo"):
-            print(i)
-            if exists(Template(filename="resource/template/city/logo/" + i, resolution=(1280, 720))):
-                return i.rsplit('.', 1)[0]
+    # flag = True
+    # while flag:
+    #     for i in os.listdir("resource\\template\\city\\logo"):
+    #         print(i)
+    #         if exists(Template(filename="resource/template/city/logo/" + i, resolution=(1280, 720))):
+    #             return i.rsplit('.', 1)[0]
+
+    citydir = {"阿妮塔能源研究所": "anita_energy_research_institute", "7号自由港": "freeport", "七号自由港": "freeport",
+               "澄明数据中心": "clarity_data_center_administration_bureau",
+               "修格里城": "shoggolith_city", "铁盟哨站": "brcl_outpost",
+               "荒原站": "wilderness_station", "曼德矿场": "mander_mine", "淘金乐园": "onederland"}
+
+    rect = [140, 545, 350, 40]
+    while True:
+        result = base.recognition_text_ocr(rect=rect)
+        if result in citydir:
+            return citydir[result]
+
+
+def is_main():
+    return True if exists(
+        Template(filename="resource/template/guide/city_ui.png", resolution=(1280, 720), threshold=0.9)) else False
 
 
 # 用来回到主界面
@@ -113,6 +116,7 @@ def backmain():
         if loc:
             touch(loc)
             flag = False
+            sleep(3)
 
 
 def back():
@@ -134,3 +138,5 @@ def back():
 def test(test):
     entercity()
     enterexchange(test)
+
+# todo： 增加进入商会的部分，需要接入识别任务函数
