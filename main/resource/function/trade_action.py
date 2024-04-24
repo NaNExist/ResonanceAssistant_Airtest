@@ -1,5 +1,6 @@
 from airtest.core.api import *
 import resource.function.city_guide as guide
+import resource.function.base_action as base
 
 
 def test(selllist, buylist, buybook):
@@ -22,30 +23,47 @@ def buyproduct(talktimes=0, book=0, product=None):
         return False
     print("购买列表：", product)
 
-    sleep(3)
+    sleep(1)
     print("进入买")
     guide.choose(0)
-    sleep(2)
+    sleep(1)
 
     # 这里负责吃书,book大于10的没写，应该没人这么无聊吧
     print("使用", book, "本书")
     eatbook(book)
-
     # 识别列表中所有商品，找到的点一下，
-    newproduct = product.copy()
     times = 5
-    while newproduct and times > 0:
-        for i in product:
-            loc = exists(
-                Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
-            if loc:
-                print("识别到商品：", i)
-                touch((loc[0] + 120, loc[1]))
-                newproduct.remove(i)
-        product = newproduct.copy()
-        print("待购货物", product)
-        swipe((670, 450), (670, 200), duration=1)
+    while times > 0:
+        loc = base.find_textlist_ocr(text=product, rect=[620, 130, 210, 520])
+        print("识别到商品及坐标：", loc)
+        if loc :
+            for i in loc:
+                touch(i[1])
+                sleep(0.5)
+            product = list(set(product) - set([name[0] for name in loc]))
+            if not product:
+                print("购买结束")
+                break
+            print("待购货物:", product)
+        swipe((670, 450), (670, 200), duration=0.5)
         times -= 1
+        # 旧逻辑
+        # for i in product:
+        #     loc = base.find_text_ocr(i,rect = [])
+        #
+        #     print(loc)
+        #     # loc = exists(
+        #     #     Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
+        #     print(loc)
+        #     if loc:
+        #         print("识别到商品：", i)
+        #         # touch((loc[0] + 120, loc[1]))
+        #         touch(loc)
+        #         newproduct.remove(i)
+        # product = newproduct.copy()
+        # print("待购货物", product)
+        # swipe((670, 450), (670, 200), duration=1)
+        # times -= 1
 
     talk(talktimes)
 
@@ -83,17 +101,34 @@ def sellproduct(talktimes=0, product=None):
     times = 5
     print("重复尝试次数", times)
     while newproduct and times > 0:
-        for i in product:
-            loc = exists(Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
-            if loc:
-                print("识别到商品：", i)
-                touch((loc[0] + 120, loc[1]))
-                newproduct.remove(i)
-                sleep(1)
-        product = newproduct.copy()
-        print("待卖货物列表：", product)
-        swipe((670, 650), (470, 200), duration=1)
+        loc = base.find_textlist_ocr(text=product, rect=[620, 130, 210, 520])
+        print("识别到商品及坐标：", loc)
+        if loc :
+            skew = 0
+            for i in loc:
+                touch((i[1][0],i[1][1]-skew))
+                skew+=120
+                sleep(0.5)
+
+            product = list(set(product) - set([name[0] for name in loc]))
+            if not product:
+                print("售卖结束")
+                break
+            print("待卖货物:", product)
+        swipe((670, 450), (670, 200), duration=0.5)
         times -= 1
+
+        # for i in product:
+        #     loc = exists(Template(filename="resource/template/product/" + i + ".png", resolution=(1280, 720)))
+        #     if loc:
+        #         print("识别到商品：", i)
+        #         touch((loc[0] + 120, loc[1]))
+        #         newproduct.remove(i)
+        #         sleep(1)
+        # product = newproduct.copy()
+        # print("待卖货物列表：", product)
+        # swipe((670, 650), (470, 200), duration=1)
+        # times -= 1
 
     talk(talktimes)
 
@@ -104,8 +139,8 @@ def sellproduct(talktimes=0, product=None):
     sleep(2)
     # 有时候会出问题，加个sleep看看
 
-def sellall(talktimes=0):
 
+def sellall(talktimes=0):
     sleep(3)
     print("进入卖")
     guide.choose(0)
@@ -120,13 +155,14 @@ def sellall(talktimes=0):
         loc = exists(Template(filename="resource/template/action/cancelall.png", resolution=(1280, 720)))
         if loc:
             break
-        touch((1200,100))
+        touch((1200, 100))
 
     talk(talktimes)
 
     if not makedeal():
         guide.back()
         return False
+
 
 def makedeal(type=0, pause=0):
     """
