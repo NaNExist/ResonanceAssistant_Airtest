@@ -2,6 +2,8 @@ from airtest.core.api import *
 import resource.function.city_guide as guide
 import json
 
+import resource.function.base_action as base
+
 
 def entermap():
     for i in range(5):
@@ -40,25 +42,23 @@ def searchcity(end_city_name=""):
 
 
 def guidecity(start_city_name="", end_city_name=""):
-    startcityloc = guide.get_city_inf(city=start_city_name, information="maploc")
-    endcityloc = guide.get_city_inf(city=end_city_name, information="maploc")
+    startcityloc = base.get_city_inf(city=start_city_name, information="maploc")
+    endcityloc = base.get_city_inf(city=end_city_name, information="maploc")
     directionvector = [endcityloc[0] - startcityloc[0], endcityloc[1] - startcityloc[1]]
     k = 300 / max(directionvector, key=abs).__abs__()
     direction = (int(directionvector[0] * k), int(-directionvector[1] * k))
-    print(direction)
-    swipe((640 + direction[0] // 2, 360 - direction[1] // 2), (640 - direction[0] // 2, 360 + direction[1] // 2),
-          duration=1)
-
+    print("目标方向为", direction)
     times = 8
     flag = True
     while flag and times > 0:
-        loc = exists(Template(filename="resource/template/city/map/" + end_city_name + ".png", resolution=(1280, 720),
-                              threshold=0.8))
+        # loc = exists(Template(filename="resource/template/city/map/" + end_city_name + ".png", resolution=(1280, 720),
+        #                       threshold=0.8))
+        loc = base.find_text_ocr(text=base.city_name_transition(end_city_name), rect=[120, 80, 1100, 600])
         if loc:
-            print("找到目标", end_city_name, "坐标", loc)
-            touch(loc)
+            print("找到目标", base.city_name_transition(end_city_name), "坐标", loc)
+            touch([loc[0], loc[1] - 15])
             return True
-        swipe((640 + direction[0] // 2, 360 - direction[0] // 2), (640 - direction[0] // 2, 360 + direction[0] // 2),
+        swipe((640 + direction[0] // 2, 360 - direction[1] // 2), (640 - direction[0] // 2, 360 + direction[1] // 2),
               duration=1)
         times -= 1
     return False
@@ -79,8 +79,16 @@ def endtravel():
         loc = exists(Template(filename="resource/template/guide/end_travel.png", resolution=(1280, 720)))
         if loc:
             touch(loc)
-            flag = False
+            break
         sleep(10)
+
+    for i in range(10):
+        if guide.is_main():
+            return True
+        touch((640, 660))
+        sleep(2)
+
+    return False
 
 
 # 这个是完整的测试逻辑
