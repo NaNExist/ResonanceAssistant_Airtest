@@ -5,39 +5,57 @@
             "exchange": [990, 200],
             "rest": [570,100],
             "battle": [550,400],
-            "commerce": [320,150]
+            "commerce": [320,150],
+            "is_main": true
         },
         "onederland": {
             "maploc": [1745,945],
-            "exchange": [790, 300]
+            "exchange": [790, 300],
+            "is_main": false
         },
         "wilderness_station": {
             "maploc": [1800,460],
-            "exchange": [970, 260]
+            "exchange": [970, 260],
+            "is_main": false
         },
         "anita_energy_research_institute": {
             "maploc": [615,1030],
-            "exchange": [640,300]
+            "exchange": [640,300],
+            "is_main": false
         },
         "freeport": {
             "maploc": [665,580],
             "exchange": [540,250],
             "rest": [780,110],
-            "battle": [900,340]
+            "battle": [900,340],
+            "commerce": [70,260],
+            "is_main": true
         },
         "brcl_outpost": {
             "maploc": [1545,460],
-            "exchange": [1000,380]
+            "exchange": [1000,380],
+            "is_main": false
         },
         "shoggolith_city": {
             "maploc": [1330,460],
             "exchange": [1150,350],
-            "battle": [330,430]
+            "battle": [330,430],
+            "commerce": [240,160],
+            "rest": [400,200],
+            "is_main": true
         },
         "clarity_data_center_administration_bureau": {
             "maploc": [1045,345],
             "exchange": [120,410],
-            "battle": [500,120]
+            "battle": [500,120],
+            "commerce": [1050,300],
+            "rest": [950,160],
+            "is_main": true
+        },
+        "anita_weapon_research_institute": {
+            "maploc": [830,680],
+            "exchange": [650,150],
+            "is_main": false
         }
     }
 }
