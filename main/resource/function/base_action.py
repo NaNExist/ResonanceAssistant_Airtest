@@ -136,7 +136,10 @@ def find_text_ocr(text="", rect=None):
     if rect:
         screen = screen[rect[1]:rect[1] + rect[3], rect[0]:rect[0] + rect[2]]
     else:
-        rect = [0, 0, 0, 0]
+        rect = [0, 0, 1280, 720]
+
+    print("搜索文本：", text, "搜索范围", rect)
+
     ocr = PaddleOCR(use_angle_cls=True, lang="ch")
     result = ocr.ocr(screen, cls=True)
     if not result:
@@ -144,10 +147,38 @@ def find_text_ocr(text="", rect=None):
     for idx in range(len(result)):
         res = result[idx]
         print(res)
+        if not res:
+            continue
         if not result:
             return False
         for line in res:
             if line[1][0] == text:
+                loc = [(line[0][0][0] + line[0][1][0]) // 2, (line[0][1][1] + line[0][2][1]) // 2]
+                return [loc[0] + rect[0], loc[1] + rect[1]]
+    return False
+
+def find_text_include_ocr(text="", rect=None):
+    screen = G.DEVICE.snapshot()
+    if rect:
+        screen = screen[rect[1]:rect[1] + rect[3], rect[0]:rect[0] + rect[2]]
+    else:
+        rect = [0, 0, 1280, 720]
+
+    print("搜索文本：", text, "搜索范围", rect)
+
+    ocr = PaddleOCR(use_angle_cls=True, lang="ch")
+    result = ocr.ocr(screen, cls=True)
+    if not result:
+        return False
+    for idx in range(len(result)):
+        res = result[idx]
+        print(res)
+        if not res:
+            continue
+        if not result:
+            return False
+        for line in res:
+            if text in line[1][0]:
                 loc = [(line[0][0][0] + line[0][1][0]) // 2, (line[0][1][1] + line[0][2][1]) // 2]
                 return [loc[0] + rect[0], loc[1] + rect[1]]
     return False
@@ -157,16 +188,22 @@ def find_textlist_ocr(text=None, rect=None):
     if not text:
         print("空参数")
         return False
+    print("搜索文本")
     screen = G.DEVICE.snapshot()
     if rect:
         screen = screen[rect[1]:rect[1] + rect[3], rect[0]:rect[0] + rect[2]]
     else:
-        rect = [0, 0, 0, 0]
+        rect = [0, 0, 1280, 720]
+
+    print("搜索文本列表：",text,"搜索范围",rect)
+
     ocr = PaddleOCR(use_angle_cls=True, lang="ch")
     result = ocr.ocr(screen, cls=True)
     resultloc = []
     for idx in range(len(result)):
         res = result[idx]
+        if not rect:
+            continue
         for line in res:
             if line[1][0] in text:
                 loc = [(line[0][0][0] + line[0][1][0]) // 2, (line[0][1][1] + line[0][2][1]) // 2]
@@ -178,14 +215,16 @@ def city_name_transition(name=""):
     if name == "":
         print("空参数")
         return False
+
+    print("转换名称：",name)
+
     citylist = [["阿妮塔能源研究所", "anita_energy_research_institute"],
                 ["7号自由港", "freeport"],
                 ["七号自由港", "freeport"],
                 ["澄明数据中心", "clarity_data_center_administration_bureau"],
                 ["修格里城", "shoggolith_city"], ["铁盟哨站", "brcl_outpost"],
                 ["荒原站", "wilderness_station"], ["曼德矿场", "mander_mine"],
-                ["淘金乐园", "onederland"]]
-    print([city[0] for city in citylist])
+                ["淘金乐园", "onederland"],["阿妮塔战备工厂","anita_weapon_research_institute"]]
     for i in citylist:
         if name == i[0]:
             return i[1]
@@ -202,11 +241,13 @@ def recognition_text_ocr(rect=None):
     newscreen = screen[rect[1]:rect[1] + rect[3], rect[0]:rect[0] + rect[2]]
     # pil_img = cv2_2_pil(newscreen)
     # pil_img.show()
+
+    print("识别文本范围", rect)
+
     ocr = PaddleOCR(use_angle_cls=True, lang="ch")
     resultlist = ocr.ocr(newscreen, cls=True, det=False)
     max = 0
     result = ""
-    print(resultlist)
     for idx in resultlist:
         for i in idx:
             if i[1] > max:
@@ -221,10 +262,14 @@ def recognition_textlist_ocr(rect=None):
         return False
     screen = G.DEVICE.snapshot()
     result = []
+    print("识别文本范围列表", rect)
     for i in range(len(rect)):
         newscreen = screen[rect[i][1]:rect[i][1] + rect[i][3], rect[i][0]:rect[i][0] + rect[i][2]]
         # pil_img = cv2_2_pil(newscreen)
         # pil_img.show()
+
+
+
         ocr = PaddleOCR(use_angle_cls=True, lang="ch")
         resultlist = ocr.ocr(newscreen, cls=True, det=False)
         max = 0
@@ -233,20 +278,25 @@ def recognition_textlist_ocr(rect=None):
                 if j[1] > max:
                     max = j[1]
                     result.append(j[0])
+    print("识别到：",result)
     return result
 
 
-def count_nearest_city(city=""):
+def count_nearest_city(city="", citylist=None):
     if city == "":
         print("空参数")
         return False
-    citylist = ["anita_energy_research_institute",
-                "freeport",
-                "clarity_data_center_administration_bureau",
-                "shoggolith_city", "brcl_outpost",
-                "wilderness_station", "mander_mine",
-                "onederland"]
+    if not citylist:
+        citylist = ["anita_energy_research_institute",
+                    "freeport",
+                    "clarity_data_center_administration_bureau",
+                    "shoggolith_city", "brcl_outpost",
+                    "wilderness_station", "mander_mine",
+                    "onederland","anita_weapon_research_institute"]
     start = get_city_inf(city=city, information="maploc")
+
+    print("正在寻找",citylist,"中距",city,"最近的城市" )
+
     distance = 1145141919810
     aim = ""
     for i in citylist:
@@ -255,7 +305,9 @@ def count_nearest_city(city=""):
         loc = get_city_inf(city=i, information="maploc")
         if distance > math.sqrt((loc[0] - start[0]) ** 2 + (loc[1] - start[1]) ** 2):
             aim = i
+            distance = math.sqrt((loc[0] - start[0]) ** 2 + (loc[1] - start[1]) ** 2)
     if aim != "":
+        print("目标为",aim)
         return aim
     else:
         print("未知错误")
@@ -269,6 +321,7 @@ def get_city_inf(city="", information=""):
     :param information: 需要坐标的店面类型
     :return: 店面坐标
     """
+    print("搜索城市：", city, "信息为：", information)
     with open("resource/setting/location.json") as f:
         data = json.load(f)
     return data["city"][city][information]
