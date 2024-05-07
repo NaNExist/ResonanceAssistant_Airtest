@@ -7,17 +7,106 @@ import requests
 
 import resource.function.base_action as base
 
-def t4(start_city, end_city):
-    with open("resource/setting/city_buy_inf.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
+class count_price():
+    def __init__(self):
+        with open("resource/setting/price_inf.json", "r", encoding="utf-8") as f:
+            self.product_inf = json.load(f)
+        self.city_tired_map = np.array(pd.read_csv("resource/setting/城市路程疲劳表.csv", header=None).values.tolist())
+        self.city_sell_map = np.array(pd.read_csv("resource/setting/商品售出价格表.csv", header=None).values.tolist())
+        self.city_buy_map = np.array(pd.read_csv("resource/setting/商品收购价格表.csv", header=None).values.tolist())
+        self.city_num_map = np.array(pd.read_csv("resource/setting/商品数量价格表.csv", header=None).values.tolist())
+        self.usecity = ["修格里城", "淘金乐园", "铁盟哨站", "荒原站", "曼德矿场", '澄明数据中心', "7号自由港",
+                   "阿妮塔战备工厂",
+                   "阿妮塔能源研究所"]
+        product = []
+        self.product = [i["name"] for i in self.product_inf if i["name"] not in product]
+        self.product_sell_map = np.zeros((len(self.product) + 1, len(self.usecity) + 1)).astype(str)
+        self.product_sell_map[0, 0] = "cat"
+        self.product_sell_map[1:, 0] = self.product
+        self.product_sell_map[0, 1:] = self.usecity
+
+        self.product_buy_map = np.zeros((len(self.product) + 1, len(self.usecity) + 1)).astype(str)
+        self.product_buy_map[0, 0] = "cat"
+        self.product_buy_map[1:, 0] = self.product
+        self.product_buy_map[0, 1:] = self.usecity
+
+        self.product_num_map = np.zeros((len(self.product) + 1, len(self.usecity) + 1)).astype(str)
+        self.product_num_map[0, 0] = "cat"
+        self.product_num_map[1:, 0] = self.product
+        self.product_num_map[0, 1:] = self.usecity
+
+        self.city_buy_inf = {i: [] for i in self.usecity}
+
+    def update_product_inf(self):
+        try:
+            HEADERS = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:124.0) Gecko/20100101 Firefox/124.0'
+            }
+            # 注意请求不要太频繁
+            self.product_inf = requests.get(
+                'https://reso-data.kmou424.moe/api/fetch/goods_info?uuid=5d9b7836-6474-4e44-881c-78ea9e116334',
+                headers=HEADERS
+            ).json()
+        except:
+            print("获取更新失败，使用上次更新数据")
+            with open("resource/setting/price_inf.json", "r", encoding="utf-8") as f:
+                self.product_inf = json.load(f)
+
+    def update_product_map(self):
+        city = []
+        if not self.product_inf :
+            with open("resource/setting/price_inf.json", "r", encoding="utf-8") as f:
+                self.product_inf  = json.load(f)
+
+
+        for i in self.product_inf :
+            if i["station"] not in self.usecity:
+                continue
+            if i["type"] == "buy":
+                self.product_sell_map[self.product.index(i["name"]) + 1][self.usecity.index(i["station"]) + 1] = i["price"]
+
+            elif i["type"] == "sell":
+                self.product_num_map[self.product.index(i["name"]) + 1][self.usecity.index(i["station"]) + 1] = i["stock"]
+                self.product_buy_map[self.product.index(i["name"]) + 1][self.usecity.index(i["station"]) + 1] = i["price"]
+                self.city_buy_inf[i["station"]].append(i["name"])
+
+        with open("resource/setting/city_buy_inf.json", "w", encoding="utf-8") as f:
+            json.dump(self.city_buy_inf, f, ensure_ascii=False)
+
+
+
+    def write_inf(self):
+        pd.DataFrame(self.product_num_map).to_csv(path_or_buf="resource/setting/商品售出价格表.csv", header=None, index=None)
+        pd.DataFrame(self.product_sell_map).to_csv(path_or_buf="resource/setting/商品收购价格表.csv", header=None,
+                                              index=None)
+        pd.DataFrame(self.product_num_map).to_csv(path_or_buf="resource/setting/商品数量价格表.csv", header=None, index=None)
+
+        with open("resource/setting/price_inf.json", "w", encoding="utf-8") as f:
+            json.dump(self.product_inf, f, ensure_ascii=False)
+        with open("resource/setting/city_buy_inf.json", "w", encoding="utf-8") as f:
+            json.dump(self.city_buy_inf, f, ensure_ascii=False)
+
+
+
+def t4(data=None,start_city=None, end_city=None,city_sell_map=None,city_buy_map=None,city_num_map=None):
+    if  not (start_city and end_city):
+        print("无起终点数据")
+        return False
+    if not data:
+        with open("resource/setting/city_buy_inf.json", "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+    if not (city_sell_map and city_buy_map and city_num_map):
+        city_sell_map = np.array(pd.read_csv("resource/setting/商品售出价格表.csv", header=None).values.tolist())
+        city_buy_map = np.array(pd.read_csv("resource/setting/商品收购价格表.csv", header=None).values.tolist())
+        city_num_map = np.array(pd.read_csv("resource/setting/商品数量价格表.csv", header=None).values.tolist())
+
+
     buy_product = data[base.city_name_transition(start_city)]
     start_city = base.city_name_transition(start_city)
     end_city = base.city_name_transition(end_city)
 
 
-    city_sell_map = np.array(pd.read_csv("resource/setting/商品售出价格表.csv", header=None).values.tolist())
-    city_buy_map = np.array(pd.read_csv("resource/setting/商品收购价格表.csv", header=None).values.tolist())
-    city_num_map = np.array(pd.read_csv("resource/setting/商品数量价格表.csv", header=None).values.tolist())
 
     product = city_sell_map[1:, 0].tolist()
 
@@ -30,17 +119,19 @@ def t4(start_city, end_city):
 
     trade_list = []
     for i in buy_product:
-        dis = product_buy_map[product.index(i)][usecity.index(end_city)] - product_sell_map[product.index(i)][
-            usecity.index(start_city)]
+        dis = product_buy_map[product.index(i)][usecity.index(end_city)] - product_sell_map[product.index(i)][usecity.index(start_city)]
         if dis > 0:
             trade_list.append([i, dis])
+
+
+
 
     trade_list = sorted(trade_list, reverse=True, key=lambda x: x[1])
     print(trade_list)
     return trade_list
 
 
-def t3(FATIGUE, PRODUCT_BUY_PRICES, PRODUCT_SELL_PRICES, PRODUCTS_IDX_TO_NAME, CITY_LIST, GET_PRODUCT_LOTS):
+def t3(CAPACITY,FATIGUE, PRODUCT_BUY_PRICES, PRODUCT_SELL_PRICES, PRODUCTS_IDX_TO_NAME, CITY_LIST, GET_PRODUCT_LOTS):
     # 货车的容量
     CAPACITY = 600
 
@@ -207,15 +298,10 @@ def t2(data=None):
         with open("resource/setting/price_inf.json", "r", encoding="utf-8") as f:
             data = json.load(f)
 
-    for i in data:
-        if i["type"] == "sell":
-            pass
-        elif i["type"] == "buy":
-            pass
-        if i["name"] not in product:
-            product.append(i["name"])
-        if i["station"] not in city:
-            city.append(i["station"])
+    # for i in data:
+    #     if i["name"] not in product:
+    #         product.append(i["name"])
+    product = [i["name"] for i in data if i["name"] not in product]
 
     usecity = ["修格里城", "淘金乐园", "铁盟哨站", "荒原站", "曼德矿场", '澄明数据中心', "7号自由港", "阿妮塔战备工厂",
                "阿妮塔能源研究所"]
@@ -248,12 +334,15 @@ def t2(data=None):
             product_buy_map[product.index(i["name"]) + 1][usecity.index(i["station"]) + 1] = i["price"]
             city_buy_inf[i["station"]].append(i["name"])
 
+
+    with open("resource/setting/city_buy_inf.json", "w", encoding="utf-8") as f:
+        json.dump(city_buy_inf, f, ensure_ascii=False)
+
     pd.DataFrame(product_buy_map).to_csv(path_or_buf="resource/setting/商品售出价格表.csv", header=None, index=None)
     pd.DataFrame(product_sell_map).to_csv(path_or_buf="resource/setting/商品收购价格表.csv", header=None, index=None)
     pd.DataFrame(product_num_map).to_csv(path_or_buf="resource/setting/商品数量价格表.csv", header=None, index=None)
 
-    with open("resource/setting/city_buy_inf.json", "w", encoding="utf-8") as f:
-        json.dump(city_buy_inf, f, ensure_ascii=False)
+
 
     city_tired_map = np.array(pd.read_csv("resource/setting/城市路程疲劳表.csv", header=None).values.tolist())
 
