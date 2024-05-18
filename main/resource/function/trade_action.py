@@ -3,7 +3,7 @@ import resource.function.city_guide as guide
 import resource.function.base_action as base
 
 
-def test( buylist, buybook):
+def test(buylist, buybook):
     sellall(talktimes=0)
     buyproduct(book=buybook, product=buylist)
     guide.backmain()
@@ -29,15 +29,19 @@ def buyproduct(talktimes=0, book=0, product=None):
     sleep(1)
 
     # 这里负责吃书,book大于10的没写，应该没人这么无聊吧
-    print("使用", book, "本书")
-    eatbook(book)
+    if book != 0:
+        print("使用", book, "本书")
+        eatbook(book)
+    else:
+        print("不使用书")
+
     # 识别列表中所有商品，找到的点一下，
     times = 5
     while times > 0:
         sleep(0.5)
         loc = base.find_textlist_ocr(text=product, rect=[620, 130, 210, 520])
         print("识别到商品及坐标：", loc)
-        if loc :
+        if loc:
             for i in loc:
                 touch(i[1])
                 sleep(0.5)
@@ -105,11 +109,11 @@ def sellproduct(talktimes=0, product=None):
         sleep(0.5)
         loc = base.find_textlist_ocr(text=product, rect=[620, 130, 210, 520])
         print("识别到商品及坐标：", loc)
-        if loc :
+        if loc:
             skew = 0
             for i in loc:
-                touch((i[1][0],i[1][1]-skew))
-                skew+=120
+                touch((i[1][0], i[1][1] - skew))
+                skew += 120
                 sleep(0.5)
 
             product = list(set(product) - set([name[0] for name in loc]))
@@ -204,9 +208,7 @@ def eatbook(times):
     return True
 
 
-
 def talk(times):
-    # todo 判断是否砍满，满了就退出
     if times == 0:
         print("不计划砍价")
         return False

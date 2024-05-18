@@ -55,7 +55,7 @@ def guidecity(start_city_name="", end_city_name=""):
     while flag and times > 0:
         # loc = exists(Template(filename="resource/template/city/map/" + end_city_name + ".png", resolution=(1280, 720),
         #                       threshold=0.8))
-        loc = base.find_text_ocr(text=base.city_name_transition(end_city_name), rect=[120, 80, 1100, 600])
+        loc = base.find_text_include_ocr(text=base.city_name_transition(end_city_name), rect=[120, 80, 1100, 600])
         if loc:
             print("找到目标", base.city_name_transition(end_city_name), "坐标", loc)
             touch([loc[0], loc[1] - 15])
@@ -95,7 +95,7 @@ def endtravel():
 
 
 # 这个是完整的测试逻辑
-def citytravel(startcity="", endcity=""):
+def city_travel(startcity="", endcity=""):
     if endcity == "":
         print("无目标城市")
         return False

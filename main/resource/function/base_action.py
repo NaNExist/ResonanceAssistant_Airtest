@@ -1,8 +1,9 @@
 import json
 import math
+import pandas as pd
 
 import airtest.core.api as air
-from airtest.aircv import cv2_2_pil
+import numpy as np
 from airtest.core.api import *
 from paddleocr import PaddleOCR
 
@@ -157,6 +158,7 @@ def find_text_ocr(text="", rect=None):
                 return [loc[0] + rect[0], loc[1] + rect[1]]
     return False
 
+
 def find_text_include_ocr(text="", rect=None):
     screen = G.DEVICE.snapshot()
     if rect:
@@ -195,7 +197,7 @@ def find_textlist_ocr(text=None, rect=None):
     else:
         rect = [0, 0, 1280, 720]
 
-    print("搜索文本列表：",text,"搜索范围",rect)
+    print("搜索文本列表：", text, "搜索范围", rect)
 
     ocr = PaddleOCR(use_angle_cls=True, lang="ch")
     result = ocr.ocr(screen, cls=True)
@@ -216,7 +218,7 @@ def city_name_transition(name=""):
         print("空参数")
         return False
 
-    print("转换名称：",name)
+    print("转换名称：", name)
 
     citylist = [["阿妮塔能源研究所", "anita_energy_research_institute"],
                 ["7号自由港", "freeport"],
@@ -224,7 +226,8 @@ def city_name_transition(name=""):
                 ["澄明数据中心", "clarity_data_center_administration_bureau"],
                 ["修格里城", "shoggolith_city"], ["铁盟哨站", "brcl_outpost"],
                 ["荒原站", "wilderness_station"], ["曼德矿场", "mander_mine"],
-                ["淘金乐园", "onederland"],["阿妮塔战备工厂","anita_weapon_research_institute"]]
+                ["淘金乐园", "onederland"], ["阿妮塔战备工厂", "anita_weapon_research_institute"],
+                ["阿妮塔发射中心", "anita_rocket_base"]]
     for i in citylist:
         if name == i[0]:
             return i[1]
@@ -239,8 +242,6 @@ def recognition_text_ocr(rect=None):
         rect = [0, 0, 1280, 720]
     screen = G.DEVICE.snapshot()
     newscreen = screen[rect[1]:rect[1] + rect[3], rect[0]:rect[0] + rect[2]]
-    # pil_img = cv2_2_pil(newscreen)
-    # pil_img.show()
 
     print("识别文本范围", rect)
 
@@ -268,8 +269,6 @@ def recognition_textlist_ocr(rect=None):
         # pil_img = cv2_2_pil(newscreen)
         # pil_img.show()
 
-
-
         ocr = PaddleOCR(use_angle_cls=True, lang="ch")
         resultlist = ocr.ocr(newscreen, cls=True, det=False)
         max = 0
@@ -278,7 +277,7 @@ def recognition_textlist_ocr(rect=None):
                 if j[1] > max:
                     max = j[1]
                     result.append(j[0])
-    print("识别到：",result)
+    print("识别到：", result)
     return result
 
 
@@ -286,33 +285,117 @@ def count_nearest_city(city="", citylist=None):
     if city == "":
         print("空参数")
         return False
+    all_city_list = [
+        "shoggolith_city", "onederland", "brcl_outpost", "wilderness_station", "mander_mine",
+        "clarity_data_center_administration_bureau", "freeport",
+        "anita_weapon_research_institute", "anita_energy_research_institute", "anita_rocket_base"
+    ]
     if not citylist:
-        citylist = ["anita_energy_research_institute",
-                    "freeport",
-                    "clarity_data_center_administration_bureau",
-                    "shoggolith_city", "brcl_outpost",
-                    "wilderness_station", "mander_mine",
-                    "onederland","anita_weapon_research_institute"]
-    start = get_city_inf(city=city, information="maploc")
+        citylist = all_city_list
 
-    print("正在寻找",citylist,"中距",city,"最近的城市" )
-
-    distance = 1145141919810
+    temp = np.array(pd.read_csv("resource/setting/城市路程疲劳表.csv", header=None).values.tolist())[1:, 1:]
+    print(temp)
+    # todo 读疲劳表找最短城市
+    print("正在寻找:", "`".join([city_name_transition(i) for i in citylist]), "中距", city_name_transition(city),
+          "最近的城市")
+    # print(np.array_equal(temp,temp.T)) 这里是检查疲劳矩阵是不是对称的
+    distance = 114514
     aim = ""
     for i in citylist:
         if i == city:
             continue
-        loc = get_city_inf(city=i, information="maploc")
-        if distance > math.sqrt((loc[0] - start[0]) ** 2 + (loc[1] - start[1]) ** 2):
+        print(i, int(temp[all_city_list.index(city)][all_city_list.index(i)]), aim)
+        dis = int(temp[all_city_list.index(city)][all_city_list.index(i)])
+        if dis < distance:
+            distance = dis
             aim = i
-            distance = math.sqrt((loc[0] - start[0]) ** 2 + (loc[1] - start[1]) ** 2)
+
     if aim != "":
-        print("目标为",aim)
+        print("目标为", aim)
         return aim
     else:
         print("未知错误")
         return False
 
+
+# todo 这里需要一个计算最佳路径的算法，用于得到商会任务的最短路径，目前暂时留存gpt版本
+def tsp_dp(cost_matrix, start_city):
+    num_cities = len(cost_matrix)
+    all_sets = 2 ** num_cities
+    dp = [[float('inf')] * num_cities for _ in range(all_sets)]
+    dp[1][start_city] = 0
+
+    for mask in range(1, all_sets):
+        for current_city in range(num_cities):
+            if mask & (1 << current_city) == 0:
+                continue
+            for next_city in range(num_cities):
+                if mask & (1 << next_city) != 0:
+                    continue
+                new_mask = mask | (1 << next_city)
+                dp[new_mask][next_city] = min(dp[new_mask][next_city],
+                                              dp[mask][current_city] + cost_matrix[current_city][next_city])
+
+    # Find the minimum cost path
+    min_cost = float('inf')
+    final_city = -1
+    for city in range(num_cities):
+        if city != start_city:
+            min_cost = min(min_cost, dp[all_sets - 1][city] + cost_matrix[city][start_city])
+            if min_cost == dp[all_sets - 1][city] + cost_matrix[city][start_city]:
+                final_city = city
+
+    # Backtrack to find the path
+    path = [final_city]
+    mask = all_sets - 1
+    while mask > 1:
+        for prev_city in range(num_cities):
+            if mask & (1 << prev_city) != 0 and dp[mask][final_city] == dp[mask ^ (1 << final_city)][prev_city] + \
+                    cost_matrix[prev_city][final_city]:
+                path.append(prev_city)
+                mask ^= (1 << final_city)
+                final_city = prev_city
+                break
+
+    path.reverse()
+    return path, min_cost
+
+
+def route_planning(start_city = None, city_list: list = None):
+    if not start_city:
+        print("无起始城市")
+        return False
+    city_tired_map = np.array(pd.read_csv("resource/setting/城市路程疲劳表.csv", header=None).values.tolist())
+    city_tired_list = city_tired_map[1:, 1:].astype(float).astype(int)
+    all_city_list = [city_name_transition(i) for i in city_tired_map[1:, 0]]
+    if not city_list:
+        city_list = all_city_list
+    if start_city not in city_list:
+        city_list.insert(0, start_city)
+    else:
+        city_list.remove(start_city)
+        city_list.insert(0, start_city)
+    cost_matrix = np.zeros((len(city_list), len(city_list)), int)
+    for i in range(len(city_list)):
+        for j in range(len(city_list)):
+            cost_matrix[i][j] = city_tired_list[all_city_list.index(city_list[i]), all_city_list.index(city_list[j])]
+    start_city = 0
+    shortest_path, total_cost = tsp_dp(cost_matrix, start_city)
+    # print("Shortest path:", [city_list[i] for i in shortest_path])
+    # print("Total cost:", total_cost)
+    return total_cost,[city_list[i] for i in shortest_path]
+
+
+
+
+# [["阿妮塔能源研究所", "anita_energy_research_institute"],
+#                 ["7号自由港", "freeport"],
+#                 ["七号自由港", "freeport"],
+#                 ["澄明数据中心", "clarity_data_center_administration_bureau"],
+#                 ["修格里城", "shoggolith_city"], ["铁盟哨站", "brcl_outpost"],
+#                 ["荒原站", "wilderness_station"], ["曼德矿场", "mander_mine"],
+#                 ["淘金乐园", "onederland"], ["阿妮塔战备工厂", "anita_weapon_research_institute"],
+#                 ["阿妮塔发射中心", "anita_rocket_base"]]
 
 def get_city_inf(city="", information=""):
     """

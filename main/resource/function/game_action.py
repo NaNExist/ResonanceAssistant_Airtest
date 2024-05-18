@@ -45,7 +45,7 @@ def init(devices=None, logdir=True, project_root="log/log.txt", compress=90):
     ocr = PaddleOCR(use_angle_cls=True, lang="ch")
 
 
-def eatphysicalmedicine(small=0, medium=0, large=0, money=0):
+def eat_physical_medicine(small=0, medium=0, large=0, money=0):
     eatdir = {"small": small, "medium": medium, "large": large}
     for i in eatdir:
         if eatdir[i] <= 0:
@@ -73,7 +73,7 @@ def eatphysicalmedicine(small=0, medium=0, large=0, money=0):
     touch((840, 360))
 
 
-def eatfatiguemedicine(small=0, medium=0, large=0, money=0):
+def eat_fatigue_medicine(small=0, medium=0, large=0, money=0):
     # todo 吃药
     pass
 
@@ -218,7 +218,6 @@ def update_mission_inf():
                     re.findall(r'至(.*?)。', mission_describe[1])[0] if re.findall(r'至(.*?)。', mission_describe[1])[
                                                                            0] != "七号自由港" else "7号自由港")
                 result.append(int(re.findall(r'\d+', mission_describe[1])[0]))
-                # todo 这里需要正则后比对
                 if result[0] not in [temp[0] for temp in freight_transport]:
                     freight_transport.append(result)
                     print("增加货运项目", result)
@@ -303,7 +302,6 @@ def drink_fatigue(loc_city=None):
 
 def clean_trade_mission(loc_city, human_transport, freight_transport, purchase_transport):
     travel_map = []
-    loc_city = base.city_name_transition(loc_city)
     print("客运任务列表：", human_transport)
     print("货运任务列表：", freight_transport)
 
@@ -320,12 +318,19 @@ def clean_trade_mission(loc_city, human_transport, freight_transport, purchase_t
     # 打印排序后的列表
     print("需要到达城市列表：", travel_map)
 
-    while travel_map:
-        aim_city = base.count_nearest_city(city=loc_city, citylist=travel_map)
-        print("当前目标", base.city_name_transition(loc_city), "->", base.city_name_transition(aim_city))
-        travel.citytravel(startcity=loc_city, endcity=aim_city)
-        travel_map = set(travel_map) - {loc_city}
-        loc_city = aim_city
+    cost, plan = base.route_planning(start_city = loc_city,city_list = travel_map)
+    print("执行路径:", "->".join(plan),"消耗疲劳",cost)
+    for i in plan[1:]:
+        print("当前目标",i)
+        travel.city_travel(startcity=loc_city, endcity=i)
+        loc_city = i
+
+    # while travel_map:
+    #     travel_map = set(travel_map) - {loc_city}
+    #     aim_city = base.count_nearest_city(city=loc_city, citylist=travel_map)
+    #     print("当前目标", base.city_name_transition(loc_city), "->", base.city_name_transition(aim_city))
+    #     travel.city_travel(startcity=loc_city, endcity=aim_city)
+    #     loc_city = aim_city
 
 
 def clean_battle_mission(city_name=None):

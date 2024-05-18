@@ -5,7 +5,7 @@ import json
 
 
 def start_battle():
-    # touch(Template(filename="resource/template/guide/battle_ready.png", resolution=(1280, 720)))#todo 改成识别文字
+    # touch(Template(filename="resource/template/guide/battle_ready.png", resolution=(1280, 720)))
     loc = base.find_text_include_ocr(text="前往作战")
     if loc:
         touch(loc)
@@ -154,4 +154,4 @@ def ispurple():
     touch((470, 660))
     return False
 
-# todo 这里要加在小地方打作战任务的部分
+# todo 这里要加在小地方打作战任务的路径逻辑
