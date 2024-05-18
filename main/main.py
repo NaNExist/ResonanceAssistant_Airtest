@@ -9,20 +9,21 @@ import resource.function.trade_action as trade
 import resource.function.city_guide as guide
 import resource.function.count_price as count
 
+
 def usertest():
     game.init()
-
-
 
     while True:
 
         print("选择操作:")
         print("1：启动游戏")
         print("2：关闭游戏")
-        print("3：城市间导航(暂时用不了)")
-        print("4：清理澄明度")
-        print("5：半自动跑商（要求车库里面留足够空间，最好是空的")
-        print("6：测试部分")
+        print("3：清理日常")
+        print("4：循环作战")
+        print("5：自动跑商（默认疲劳跑到500停，不会用书")
+        print("6：计算当前跑商方案")
+        print("7：监控方案")
+        print("8：测试部分（不用")
 
         print("")
         choose = int(input())
@@ -32,39 +33,39 @@ def usertest():
             case 2:
                 game.closeapp()
             case 3:
-                print("去哪个城市")
-                print("1：阿妮塔能源研究站")
-                print("2：7号自由港")
-                print("3：澄明数据中心")
-                print("4：修格里城")
-                print("5：铁盟哨站")
-                print("6：荒原站")
-                print("7：曼德矿场")
-                print("8：淘金乐园")
-                choose = int(input())
+                core.daily_work(parm=3)
             case 4:
-                # print("输入作战次数（数字1-inf（只会打到没澄明或者到次数，第几类敌人（数字1-3，什么难度（数字1-6（默认打紫箱子的。空格间隔输入")
-                # inputlist = list(map(int,input().split(" ")))
-                # times =  inputlist[0]
-                # enemy = inputlist[1]
-                # difficult = inputlist[2]
-                battle.test(times=-1, enemy=2, difficult=3)
-            #   times是作战次数，enemy是选择敌人，difficult是难度选择 均从1开始
+                battle.expel_battle_loop()
             case 5:
-                pass
+                print("疲劳跑到多少,输入0就是默认到500")
+                fatigue_limit = int(input())
+                book = int(input("book_num="))
+                core.business_traffic(book= book,fatigue_limit=fatigue_limit if fatigue_limit != 0 else 500)
             case 6:
-                core.program_plan()
+                book = int(input("book_num="))
+                core.monitor_data(book=book)
+            case 7:
+                # print("花几本书")
+                # income_limit_set = int(input())
+                # print("花几本书")
+                # income_each_fatigue_set =  int(input())
+                book = int(input("book_num="))
+                core.monitor_data_notice(book=book, income_set=0, income_each_fatigue_set=1)
 
+            case 8:
+                # core.program_plan()
+                # core.program_plan_test()
+                book = int(input("book_num="))
+                core.business_traffic(book= book)
+                # base.count_nearest_city(city="anita_weapon_research_institute")
+                # print(count.calculation_scheme(book=4))
 
+                # battle.expel_battle_loop(times=-1)
                 # game.update_user_inf()
                 # game.update_mission_inf()
                 # game.clean_battle_mission(city_name=None)
                 # count.temp()
                 # core.count_business_proposal()
 
-
-
-
-
-usertest()
-
+if __name__ =="__main__":
+    usertest()
